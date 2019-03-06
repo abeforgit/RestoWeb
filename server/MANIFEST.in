@@ -1,0 +1,3 @@
+graft restoweb/templates
+graft restoweb/static
+include restoweb/schema.sql
