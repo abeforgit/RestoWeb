@@ -1,4 +1,4 @@
-from app import app
+from restoweb import app
 from urllib import request
 from flask_testing import LiveServerTestCase
 
