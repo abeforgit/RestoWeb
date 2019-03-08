@@ -1,4 +1,4 @@
-from .restoweb import db
+from restoweb import db
 
 
 class User(db.Model):
@@ -11,8 +11,17 @@ class User(db.Model):
 
 
 class Resto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
-        return f"Resto({self.name}, {self.location})"
+        return f"Resto({self.id}, {self.name}, {self.location})"
+
+
+class Menu(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, nullable=False)
+
+    def __repr__(self):
+        return f"Menu({self.date})"

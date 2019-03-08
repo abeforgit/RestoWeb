@@ -1,6 +1,7 @@
-from .restoweb import app
+from restoweb import app
 
 
 @app.route('/')
 def index():
     return "RestoWeb"
+
