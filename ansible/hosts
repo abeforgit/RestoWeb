@@ -1,0 +1,2 @@
+[debian]
+school ansible_ssh_host=groep22.webdev.ilabt.imec.be ansible_ssh_user=groep22
