@@ -25,6 +25,7 @@
 
   roles:
 
+    - role: passenger
     - role: nginx_vhost
       nginx_vhost_file: 'groep22.webdev.ilabt.imec.be'
       tags:

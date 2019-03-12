@@ -5,22 +5,21 @@
 
 - name: Ensure HTTPS support for APT is installed
   apt:
-    pkg: "{{ item }}"
-  with_items:
-    - apt-transport-https
-    - ca-certificates
+    name:
+        - apt-transport-https
+        - ca-certificates
+    state: present
 
 - name: Ensure the Passenger APT-repository is added
   apt_repository:
-    repo: 'deb https://oss-binaries.phusionpassenger.com/apt/passenger jessie main'
+    repo: 'deb https://oss-binaries.phusionpassenger.com/apt/passenger xenial main'
 
 - name: Install nginx-extras and Passenger
   apt:
-    name: "{{ item }}"
+    name:
+        - nginx-extras
+        - passenger
     state: present
-  with_items:
-    - nginx-extras
-    - passenger
 
 - name: Add passenger.conf to nginx
   copy: src=passenger.conf dest=/etc/nginx/conf.d/passenger.conf
