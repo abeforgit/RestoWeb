@@ -14,7 +14,7 @@ server {
 server {
     listen 443 ssl http2;
     server_name groep22.webdev.ilabt.imec.be;
-    root /home/groep22/public/current/;
+    root /home/resto/public/;
     index index.html;
 
     ####################
