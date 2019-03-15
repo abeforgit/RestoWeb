@@ -8,8 +8,8 @@ setup(
     install_requires=[
         'flask',
         'flask_sqlalchemy',
+        'flask_migrate',
         'autopep8',
         'pre-commit'
     ],
 )
-
