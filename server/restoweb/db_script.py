@@ -33,7 +33,7 @@ restos = [
 schedules = [
     models.Schedules(
         time_open=time(hour=11, minute=15),
-        time_closed=time(hour=14)
+        time_closed=time(hour=14, minute=0)
     )
 ]
 
