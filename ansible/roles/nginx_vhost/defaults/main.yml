@@ -1,0 +1,2 @@
+---
+nginx_vhost_location: 'host_files/{{ inventory_hostname }}/nginx/'
