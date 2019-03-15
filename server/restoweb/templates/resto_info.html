@@ -16,8 +16,11 @@
 
     <h2>Opening hours</h2>
     <p>
-
+        {% for sched in schedules %}
+            {{ sched.time_open.strftime("%H:%M") }} - {{ sched.time_closed.strftime("%H:%M") }} <br>
+        {% endfor %}
     </p>
 
     <h2>Menu</h2>
+
 {% endblock %}

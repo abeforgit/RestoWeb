@@ -33,12 +33,49 @@ restos = [
 schedules = [
     models.Schedules(
         time_open=time(hour=11, minute=15),
-        time_closed=time(hour=14, minute=0)
-    )
+        time_closed=time(hour=14, minute=0),
+        lunch=True,
+
+        resto_id=1
+    ),
+    models.Schedules(
+        time_open=time(hour=17, minute=30),
+        time_closed=time(hour=21, minute=0),
+        dinner=True,
+
+        resto_id=1
+    ),
+
+    models.Schedules(
+        time_open=time(hour=8, minute=0),
+        time_closed=time(hour=14, minute=0),
+        breakfast=True,
+
+        resto_id=2
+    ),
+    models.Schedules(
+        time_open=time(hour=11, minute=15),
+        time_closed=time(hour=14, minute=0),
+        lunch=True,
+
+        resto_id=2
+    ),
+
+    models.Schedules(
+        time_open=time(hour=11, minute=15),
+        time_closed=time(hour=14, minute=0),
+        lunch=True,
+
+        resto_id=3
+    ),
+
 ]
 
 for resto in restos:
     db.session.add(resto)
+
+for schedule in schedules:
+    db.session.add(schedule)
 
 
 db.session.commit()

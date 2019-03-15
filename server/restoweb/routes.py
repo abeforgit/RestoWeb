@@ -2,6 +2,7 @@ from restoweb import app
 from restoweb import models
 from flask import render_template
 
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -20,3 +21,8 @@ def resto_info(resto_id):
     resto = models.Resto.query.get_or_404(resto_id)
     schedules = models.Schedules.query.filter_by(resto_id=resto_id).all()
     return render_template("resto_info.html", resto=resto, schedules=schedules)
+
+
+@app.route('/login')
+def login():
+    return render_template("login.html")
