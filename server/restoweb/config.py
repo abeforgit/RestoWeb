@@ -3,6 +3,12 @@ class BaseConfig:
     TESTING = False
 
 
+
+
+
+
+
+
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = True
