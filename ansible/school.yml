@@ -1,0 +1,32 @@
+---
+- name: Shoot school!
+  hosts: school
+  user: root
+
+  pre_tasks:
+    - name: Update system
+      apt:
+        update_cache: yes
+      tags: update
+
+    - name: Install utilities
+      apt:
+        name:
+          - ack-grep
+          - vim
+          - zsh
+          - tmux
+          - htop
+          - tree
+          - curl
+          - unzip
+          - git-core
+          - sudo
+
+  roles:
+
+    - role: passenger
+    - role: nginx_vhost
+      nginx_vhost_file: 'groep22.webdev.ilabt.imec.be'
+      tags:
+        - nginx
