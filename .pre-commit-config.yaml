@@ -1,0 +1,7 @@
+default_language_version:
+    python: python3.7
+repos:
+  -   repo: https://github.com/pre-commit/mirrors-autopep8
+      rev: v1.4.3  # Use the sha / tag you want to point at
+      hooks:
+      -   id: autopep8

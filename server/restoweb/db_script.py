@@ -40,4 +40,5 @@ schedules = [
 for resto in restos:
     db.session.add(resto)
 
+
 db.session.commit()
