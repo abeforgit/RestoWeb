@@ -2,7 +2,6 @@ from restoweb import app
 from restoweb import models
 from flask import render_template
 
-
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -16,5 +15,8 @@ def show_restos():
 
 @app.route('/resto/<int:resto_id>')
 def resto_info(resto_id):
-    resto = models.Resto.query.filter_by(id=resto_id).first()
-    return render_template("resto_info.html", resto=resto)
+    # Find resto and schedules matching the given id
+    # If no resto found, return 404
+    resto = models.Resto.query.get_or_404(resto_id)
+    schedules = models.Schedules.query.filter_by(resto_id=resto_id).all()
+    return render_template("resto_info.html", resto=resto, schedules=schedules)
