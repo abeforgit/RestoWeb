@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ resto.name }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ resto.name }}</h1>
+    <h2>Location</h2>
+    <p>
+        {{ resto.zip_code }} {{ resto.city }} <br>
+        {{ resto.address }} <br>
+        {{ resto.campus }} <br>
+        {{ resto.description }} <br>
+    </p>
+    <h2>Menu</h2>
+{% endblock %}

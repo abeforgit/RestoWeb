@@ -1,6 +1,7 @@
 from restoweb import db
 from restoweb import models
 
+db.drop_all()
 db.create_all()
 
 db.session.add(models.Resto(
