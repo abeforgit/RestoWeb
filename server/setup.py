@@ -9,7 +9,7 @@ setup(
         'flask',
         'flask_sqlalchemy',
         'autopep8',
-        'pre-commit'
+        'pre-commit',
+        'uwsgi'
     ],
 )
-
