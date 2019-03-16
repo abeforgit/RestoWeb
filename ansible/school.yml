@@ -25,15 +25,14 @@
 
   roles:
 
-    - role: passenger
+    - role: user
+      user_name: resto
+      user_directories:
+        - directory: 'log'
+
+    - role: resto
 
     - role: nginx_vhost
       nginx_vhost_file: 'groep22.webdev.ilabt.imec.be'
       tags:
         - nginx
-
-    - role: user
-      user_name: resto
-      user_directories:
-        - directory: 'log'
-        - directory: 'public'

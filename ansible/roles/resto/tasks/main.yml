@@ -1,0 +1,39 @@
+---
+- name: Clone resto git repo
+  git:
+    repo: https://github.com/abeforgit/RestoWeb.git
+    dest: /home/resto/RestoWeb
+  become_user: resto
+
+- name: software-properties-common
+  apt:
+    name: software-properties-common
+    state: present
+
+- name: Ensure the Python APT-repository is added
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+
+- name: Install python3.7
+  apt:
+    name:
+        - python3.7
+        - python3.7-dev
+        - python3.7-venv
+    state: present
+
+- name: Setup restoweb software
+  shell: /home/resto/RestoWeb/server/setup.sh
+  args:
+    chdir: /home/resto/RestoWeb/server
+    executable: /bin/bash
+    creates: /home/resto/RestoWeb/server/venv
+  become_user: resto
+
+- name: Install systemd unit file
+  template:
+      src: restoweb.service.j2
+      dest: /etc/systemd/system/restoweb.service
+
+- name: Start restoweb
+  systemd: state=started name=restoweb daemon_reload=yes
