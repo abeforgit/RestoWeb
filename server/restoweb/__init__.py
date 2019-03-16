@@ -1,5 +1,3 @@
-import restoweb.routes
-import restoweb.models
 from . import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -27,3 +25,6 @@ env = Environment(
     loader=PackageLoader('restoweb', 'templates'),
     autoescape=select_autoescape(['html', 'xml'])
 )
+
+import restoweb.routes
+import restoweb.models
