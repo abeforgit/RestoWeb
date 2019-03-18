@@ -11,6 +11,6 @@ setup(
         'autopep8',
         'pre-commit',
         "jinja2"
+        'uwsgi'
     ],
 )
-

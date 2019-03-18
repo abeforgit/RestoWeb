@@ -1,0 +1,10 @@
+[Unit]
+Description=uWSGI instance to serve restoweb
+After=network.target
+
+[Service]
+User=resto
+Group=www-data
+WorkingDirectory=/home/resto/RestoWeb/server
+Environment="PATH=/home/resto/RestoWeb/server/venv/bin"
+ExecStart=/home/resto/RestoWeb/server/venv/bin/uwsgi --ini restoweb.ini
