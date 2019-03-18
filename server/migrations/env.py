@@ -1,5 +1,5 @@
-from flask import current_app
 from __future__ import with_statement
+from flask import current_app
 
 import logging
 from logging.config import fileConfig
