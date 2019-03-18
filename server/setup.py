@@ -10,6 +10,7 @@ setup(
         'flask_sqlalchemy',
         'flask_migrate',
         'autopep8',
-        'pre-commit'
+        'pre-commit',
+        'uwsgi'
     ],
 )

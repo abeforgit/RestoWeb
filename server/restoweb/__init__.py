@@ -27,5 +27,6 @@ env = Environment(
     loader=PackageLoader('restoweb', 'templates'),
     autoescape=select_autoescape(['html', 'xml'])
 )
-import restoweb.models
+
 import restoweb.routes
+import restoweb.models

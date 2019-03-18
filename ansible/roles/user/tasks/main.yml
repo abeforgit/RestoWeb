@@ -13,9 +13,3 @@
     group: "{{ item.group | default(user.name) }}"
     state: directory
   with_items: "{{ user_directories }}"
-
-- name: Install authorized keys
-  authorized_key:
-    user: "{{ user.name }}"
-    key: "{{ user_authorized_keys }}"
-    exclusive: False

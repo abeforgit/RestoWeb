@@ -13,19 +13,23 @@ class Resto(db.Model):
 
     name = db.Column(db.String(50), nullable=False)
 
-    zip_code = db.Column(db.String(10))
-    city = db.Column(db.String(30))
-    address = db.Column(db.String(50))
+    zip_code = db.Column(db.String(10), nullable=False)
+    city = db.Column(db.String(30), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
 
-    campus = db.Column(db.String(50), nullable=True)
-    description = db.Column(db.Text, nullable=True)
+    campus = db.Column(db.String(50))
+    description = db.Column(db.Text)
 
 
 class Schedules(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    time_open = db.Column(db.Time)
-    working_time = db.Column(db.Integer)
+    time_open = db.Column(db.Time, nullable=False)
+    time_closed = db.Column(db.Time, nullable=False)
+
+    breakfast = db.Column(db.Boolean, nullable=False)
+    lunch = db.Column(db.Boolean, nullable=False)
+    dinner = db.Column(db.Boolean, nullable=False)
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
@@ -33,6 +37,6 @@ class Schedules(db.Model):
 class Menu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, nullable=False)
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
