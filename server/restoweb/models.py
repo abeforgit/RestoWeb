@@ -27,9 +27,9 @@ class Schedules(db.Model):
     time_open = db.Column(db.Time, nullable=False)
     time_closed = db.Column(db.Time, nullable=False)
 
-    breakfast = db.Column(db.Boolean, nullable=False)
-    lunch = db.Column(db.Boolean, nullable=False)
-    dinner = db.Column(db.Boolean, nullable=False)
+    breakfast = db.Column(db.Boolean, nullable=False, default=False)
+    lunch = db.Column(db.Boolean, nullable=False, default=False)
+    dinner = db.Column(db.Boolean, nullable=False, default=False)
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
@@ -40,3 +40,14 @@ class Menu(db.Model):
     date = db.Column(db.Date, nullable=False)
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
+
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(30), nullable=False)
+    price = db.Column(db.Float)
+    diet = db.Column(db.String(50))
+
+    menu_id = db.Column(db.Integer, db.ForeignKey('menu.id'))

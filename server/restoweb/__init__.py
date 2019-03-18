@@ -29,4 +29,5 @@ env = Environment(
 )
 
 import restoweb.routes
+import restoweb.error_routes
 import restoweb.models

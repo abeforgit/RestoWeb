@@ -11,6 +11,7 @@ setup(
         'flask_migrate',
         'autopep8',
         'pre-commit',
+        "jinja2"
         'uwsgi'
     ],
 )
