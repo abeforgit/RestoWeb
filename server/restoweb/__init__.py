@@ -1,8 +1,9 @@
-from . import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate
 from jinja2 import Environment, PackageLoader, select_autoescape
+from . import config
 
 
 conf = {
@@ -22,6 +23,8 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+migrate = Migrate(app, db)
+
 
 env = Environment(
     loader=PackageLoader('restoweb', 'templates'),
