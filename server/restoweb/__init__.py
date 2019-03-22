@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from jinja2 import Environment, PackageLoader, select_autoescape
 from . import config
-
+from flask_cors import CORS
 
 conf = {
     "development": config.DevelopmentConfig
@@ -24,6 +24,7 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
+CORS(app)
 
 
 env = Environment(
