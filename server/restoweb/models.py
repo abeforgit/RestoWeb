@@ -21,7 +21,7 @@ class Resto(db.Model):
     description = db.Column(db.Text)
 
 
-class Schedules(db.Model):
+class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     time_open = db.Column(db.Time, nullable=False)

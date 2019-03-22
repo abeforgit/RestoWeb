@@ -31,14 +31,14 @@ restos = [
 ]
 
 schedules = [
-    models.Schedules(
+    models.Schedule(
         time_open=time(hour=11, minute=15),
         time_closed=time(hour=14, minute=0),
         lunch=True,
 
         resto_id=1
     ),
-    models.Schedules(
+    models.Schedule(
         time_open=time(hour=17, minute=30),
         time_closed=time(hour=21, minute=0),
         dinner=True,
@@ -46,14 +46,14 @@ schedules = [
         resto_id=1
     ),
 
-    models.Schedules(
+    models.Schedule(
         time_open=time(hour=8, minute=0),
         time_closed=time(hour=14, minute=0),
         breakfast=True,
 
         resto_id=2
     ),
-    models.Schedules(
+    models.Schedule(
         time_open=time(hour=11, minute=15),
         time_closed=time(hour=14, minute=0),
         lunch=True,
@@ -61,7 +61,7 @@ schedules = [
         resto_id=2
     ),
 
-    models.Schedules(
+    models.Schedule(
         time_open=time(hour=11, minute=15),
         time_closed=time(hour=14, minute=0),
         lunch=True,
