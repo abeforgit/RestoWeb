@@ -7,7 +7,7 @@
 {% block content %}
     <ul>
         {% for resto in resto_list %}
-            <li><a href="{{ url_for('resto_info', resto_id=resto.id) }}">{{ resto.name }}</a></li>
+            <li><resto-item v-bind:resto="{{ resto.serialize() }}"></resto-item></li>
         {% endfor %}
     </ul>
 {% endblock %}

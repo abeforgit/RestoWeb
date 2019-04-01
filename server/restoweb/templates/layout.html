@@ -3,9 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
 
     <body>
+        <div id="app">
         {% block content %}{% endblock %}
+        </div>
     </body>
+    <script src="{{ url_for('static', filename='test.js')}}"></script>
 </html>

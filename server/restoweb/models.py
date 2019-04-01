@@ -1,4 +1,16 @@
 from restoweb import db
+from sqlalchemy.inspection import inspect
+import json
+
+
+class Serializer(object):
+
+    def serialize(self):
+        return json.dumps({c: getattr(self, c) for c in inspect(self).attrs.keys()})
+
+    @staticmethod
+    def serialize_list(l):
+        return [m.serialize() for m in l]
 
 
 class User(db.Model):
@@ -8,7 +20,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
 
 
-class Resto(db.Model):
+class Resto(db.Model, Serializer):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(50), nullable=False)
