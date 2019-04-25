@@ -8,7 +8,7 @@
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import axios from 'axios';
-const URL = "http://127.0.0.1:5000/restos";
+const URL = "https://test-cors.org";
 
 @Component
 export default class HelloWorld extends Vue {
@@ -22,8 +22,13 @@ export default class HelloWorld extends Vue {
 
   public async getData() {
       let res = await axios({
+          baseURL: URL,
+          url: "/",
           method: "get",
+
+
           headers: {
+              "Access-Control-Allow-Origin": "*"
           }
       });
       return res.data;
