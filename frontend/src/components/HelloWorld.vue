@@ -1,17 +1,33 @@
 <template>
   <div class="hello">
-      <div>{{msg}}</div>
+      <div>{{serverdata}}</div>
   </div>
 </template>
 
 <script lang="ts">
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
-const URL = "http://127.0.0.1:5000/"
+import axios from 'axios';
+const URL = "http://127.0.0.1:5000/restos";
 
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
+  public serverdata: string = "";
+
+  created() {
+      this.getData().then((result) => this.serverdata = result);
+
+  }
+
+  public async getData() {
+      let res = await axios({
+          method: "get",
+          headers: {
+          }
+      });
+      return res.data;
+  }
 }
 </script>
 
