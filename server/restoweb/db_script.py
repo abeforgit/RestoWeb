@@ -1,4 +1,4 @@
-from . import db
+from restoweb import db
 from restoweb import models
 from datetime import time
 

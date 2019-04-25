@@ -72,9 +72,9 @@ def restos_menus(resto_id):
         per_page = 15
         page = request.args.get('page', default=1, type=int)
 
-        menus = models.Menu.query.order_by(models.Menu.date.desc()).paginate(page, per_page, error_out=False)
-        # for menu in menus:
-        #     dishes = 0
+        menus = models.Menu.query.filter_by(resto_id=resto_id).order_by(models.Menu.date.desc()).paginate(page, per_page, error_out=False)
+        for menu in menus:
+            dishes = 0
         #     for dish in dishes:
         #         pass
 

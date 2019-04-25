@@ -46,7 +46,7 @@ class Menu(db.Model):
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
-    contains_dish = db.relationship('MenuContainsDish', secondary=menu_contains_dish, lazy='subquery',
+    contains_dish = db.relationship('Dish', secondary=menu_contains_dish, lazy='subquery',
                                     backref=db.backref('menu', lazy=True))
 
 
