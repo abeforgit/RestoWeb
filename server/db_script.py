@@ -1,6 +1,6 @@
 from restoweb import db
 from restoweb import models
-from datetime import time
+import datetime
 
 db.drop_all()
 db.create_all()
@@ -32,49 +32,74 @@ restos = [
 
 schedules = [
     models.Schedule(
-        time_open=time(hour=11, minute=15),
-        time_closed=time(hour=14, minute=0),
-        lunch=True,
+        time_open=datetime.time(hour=11, minute=15),
+        time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=1
     ),
     models.Schedule(
-        time_open=time(hour=17, minute=30),
-        time_closed=time(hour=21, minute=0),
-        dinner=True,
+        time_open=datetime.time(hour=17, minute=30),
+        time_closed=datetime.time(hour=21, minute=0),
 
         resto_id=1
     ),
 
     models.Schedule(
-        time_open=time(hour=8, minute=0),
-        time_closed=time(hour=14, minute=0),
-        breakfast=True,
+        time_open=datetime.time(hour=8, minute=0),
+        time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=2
     ),
     models.Schedule(
-        time_open=time(hour=11, minute=15),
-        time_closed=time(hour=14, minute=0),
-        lunch=True,
+        time_open=datetime.time(hour=11, minute=15),
+        time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=2
     ),
 
     models.Schedule(
-        time_open=time(hour=11, minute=15),
-        time_closed=time(hour=14, minute=0),
-        lunch=True,
+        time_open=datetime.time(hour=11, minute=15),
+        time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=3
     ),
 ]
+
+menus = [
+    models.Menu(
+        date=datetime.date(2001, 5, 12),
+        resto_id=1
+    ),
+
+    models.Menu(
+        date=datetime.date(2019, 12, 31),
+        resto_id=1
+    )
+]
+
+menus[0].dishes.append(models.Dish(
+    name="Hamburger",
+    type="Vlees",
+    price=1.50,
+    diet="150+"
+))
+
+menus[0].dishes.append(models.Dish(
+    name="Eend",
+    type="Goor",
+    price=17.95
+))
+
+
 
 for resto in restos:
     db.session.add(resto)
 
 for schedule in schedules:
     db.session.add(schedule)
+
+for menu in menus:
+    db.session.add(menu)
 
 
 db.session.commit()

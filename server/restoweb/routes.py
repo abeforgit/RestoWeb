@@ -58,7 +58,9 @@ def restos_info(resto_id):
                            description=resto.description,
                            location=location,
                            menus=menus,
-                           schedules=schedule_result)
+                           schedules=schedule_result,
+
+                           id=url_for('.restos_info', resto_id=resto.id, _external=True))
         else:
             return render_template("restos_info.html", resto=resto, schedules=schedules)
 
@@ -69,15 +71,7 @@ def restos_info(resto_id):
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'DELETE'])
 def restos_menus(resto_id):
     if request.method == 'GET':
-        per_page = 15
-        page = request.args.get('page', default=1, type=int)
-
-        menus = models.Menu.query.filter_by(resto_id=resto_id).order_by(models.Menu.date.desc()).paginate(page, per_page, error_out=False)
-        for menu in menus:
-            dishes = 0
-        #     for dish in dishes:
-        #         pass
-
+        pass
     elif request.method == 'DELETE':
         pass
 
@@ -89,6 +83,18 @@ def menus():
 
 @app.route('/menus/<int:menu_id>')
 def menus_info(menu_id):
+    if request.method == 'GET':
+        menu = models.Menu.query.get_or_404(menu_id)
+        if request.content_type == 'application/json':
+            dish_list = []
+            for dish in menu.dishes:
+                dish_list.append({
+                    'id': url_for('.dishes_info', dish_id=dish.id, _external=True),
+                    'name': dish.name
+                })
+
+            return jsonify(date=menu.date,
+                           dishes=dish_list)
     pass
 
 
@@ -106,4 +112,14 @@ def dishes():
 def dishes_info(dish_id):
     if request.method == 'GET':
         dish = models.Dish.query.get_or_404(dish_id)
-    pass
+        if request.content_type == 'application/json':
+            return jsonify(
+                name=dish.name,
+                type=dish.type,
+                price=dish.price,
+                diet=dish.diet,
+
+                id=url_for('.dishes_info', dish_id=dish.id, _external=True)
+            )
+    else:
+        pass
