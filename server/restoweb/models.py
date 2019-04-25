@@ -16,9 +16,12 @@ class Resto(db.Model):
     zip_code = db.Column(db.String(10), nullable=False)
     city = db.Column(db.String(30), nullable=False)
     address = db.Column(db.String(50), nullable=False)
-
     campus = db.Column(db.String(50))
+
     description = db.Column(db.Text)
+
+    schedule = db.relationship('Schedule', backref='resto', lazy=True)
+    menu = db.relationship('Menu', backref='resto', lazy=True)
 
 
 class Schedule(db.Model):
@@ -27,11 +30,13 @@ class Schedule(db.Model):
     time_open = db.Column(db.Time, nullable=False)
     time_closed = db.Column(db.Time, nullable=False)
 
-    breakfast = db.Column(db.Boolean, nullable=False, default=False)
-    lunch = db.Column(db.Boolean, nullable=False, default=False)
-    dinner = db.Column(db.Boolean, nullable=False, default=False)
-
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
+
+
+menu_contains_dish = db.Table('menu_contains_dish',
+                              db.Column('menu_id', db.Integer, db.ForeignKey('menu.id'), primary_key=True),
+                              db.Column('dish_id', db.Integer, db.ForeignKey('dish.id'), primary_key=True)
+                              )
 
 
 class Menu(db.Model):
@@ -41,6 +46,9 @@ class Menu(db.Model):
 
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
+    contains_dish = db.relationship('MenuContainsDish', secondary=menu_contains_dish, lazy='subquery',
+                                    backref=db.backref('menu', lazy=True))
+
 
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,5 +57,3 @@ class Dish(db.Model):
     type = db.Column(db.String(30), nullable=False)
     price = db.Column(db.Float)
     diet = db.Column(db.String(50))
-
-    menu_id = db.Column(db.Integer, db.ForeignKey('menu.id'))

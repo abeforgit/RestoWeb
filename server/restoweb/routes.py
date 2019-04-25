@@ -35,16 +35,50 @@ def restos_info(resto_id):
     if request.method == 'GET':
         resto = models.Resto.query.get_or_404(resto_id)
         schedules = models.Schedule.query.filter_by(resto_id=resto_id).all()
+        if request.content_type == 'application/json':
+            schedule_result = []
+            for schedule in schedules:
+                schedule_result.append({
+                    'time_open': schedule.time_open.isoformat(),
+                    'time_closed': schedule.time_closed.isoformat()
+                })
 
-        return render_template("restos_info.html", resto=resto, schedules=schedules)
+            location = {
+                'zip_code': resto.zip_code,
+                'city': resto.city,
+                'address': resto.address,
+                'campus': resto.campus
+            }
+
+            menus = {
+                'id': url_for('.restos_menus', resto_id=resto.id, _external=True)
+            }
+
+            return jsonify(name=resto.name,
+                           description=resto.description,
+                           location=location,
+                           menus=menus,
+                           schedules=schedule_result)
+        else:
+            return render_template("restos_info.html", resto=resto, schedules=schedules)
+
+    elif request.method == 'DELETE':
+        pass
 
 
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'DELETE'])
-def resto_menus(resto_id):
+def restos_menus(resto_id):
     if request.method == 'GET':
-        menus = models.Menu.query.filter_by(resto_id=resto_id)
+        menus_result = []
 
-        return render_template("")
+        menus = models.Menu.query.filter_by(resto_id=resto_id).all()
+        for menu in menus:
+            dishes = models.Dish.query.filter_by(menu_id=menu.id).all()
+            for dish in dishes:
+                pass
+
+    elif request.method == 'DELETE':
+        pass
 
 
 @app.route('/menus', methods=['GET', 'POST'])
@@ -69,4 +103,6 @@ def dishes():
 
 @app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE', 'PUT'])
 def dishes_info(dish_id):
+    if request.method == 'GET':
+        dish = models.Dish.query.get_or_404(dish_id)
     pass
