@@ -22,5 +22,9 @@
     </p>
 
     <h2>Menu</h2>
-
+    <ul>
+    {% for m in resto.menu %}
+        <li><a href="{{ m.get_info_url() }}">Menu voor {{ m.date.isoformat() }}</a></li>
+    {% endfor %}
+    </ul>
 {% endblock %}

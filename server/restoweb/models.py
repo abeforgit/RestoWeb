@@ -1,3 +1,4 @@
+from flask import url_for
 from restoweb import db
 
 
@@ -23,6 +24,12 @@ class Resto(db.Model):
     schedule = db.relationship('Schedule', backref='resto', lazy=True)
     menu = db.relationship('Menu', backref='resto', lazy=True)
 
+    def get_info_url(self):
+        return url_for('.restos_info', resto_id=self.id, _external=True)
+
+    def get_menus_url(self):
+        return url_for('.restos_menus', resto_id=self.id, _external=True)
+
 
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,7 +54,13 @@ class Menu(db.Model):
     resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
     dishes = db.relationship('Dish', secondary=menu_contains_dish, lazy='subquery',
-                            backref=db.backref('dishes', lazy=True))
+                             backref=db.backref('dishes', lazy=True))
+
+    def get_info_url(self):
+        return url_for('.menus_info', menu_id=self.id, _external=True)
+
+    def get_dishes_url(self):
+        return url_for('.menus_dishes', menu_id=self.id, _external=True)
 
 
 class Dish(db.Model):

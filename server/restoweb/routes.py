@@ -16,12 +16,9 @@ def restos():
     if request.method == 'GET':
         resto_list = models.Resto.query.all()
         if request.content_type == 'application/json':
-            result = []
-            for resto in resto_list:
-                result.append({
-                    'name': resto.name,
-                    'id': url_for('.restos_info', resto_id=resto.id, _external=True)
-                })
+            result = [{'name': resto.name,
+                       'id': resto.get_info_url()}
+                      for resto in resto_list]
             return jsonify(restos=result)
         else:
             return render_template("restos.html", resto_list=resto_list)
@@ -36,12 +33,10 @@ def restos_info(resto_id):
         resto = models.Resto.query.get_or_404(resto_id)
         schedules = models.Schedule.query.filter_by(resto_id=resto_id).all()
         if request.content_type == 'application/json':
-            schedule_result = []
-            for schedule in schedules:
-                schedule_result.append({
-                    'time_open': schedule.time_open.isoformat(),
-                    'time_closed': schedule.time_closed.isoformat()
-                })
+            schedule_result = [{
+                'time_open': schedule.time_open.isoformat(),
+                'time_closed': schedule.time_closed.isoformat()
+                } for schedule in schedules]
 
             location = {
                 'zip_code': resto.zip_code,
@@ -51,7 +46,7 @@ def restos_info(resto_id):
             }
 
             menus = {
-                'id': url_for('.restos_menus', resto_id=resto.id, _external=True)
+                'id': resto.get_menus_url()
             }
 
             return jsonify(name=resto.name,
@@ -60,7 +55,7 @@ def restos_info(resto_id):
                            menus=menus,
                            schedules=schedule_result,
 
-                           id=url_for('.restos_info', resto_id=resto.id, _external=True))
+                           id=resto.get_info_url())
         else:
             return render_template("restos_info.html", resto=resto, schedules=schedules)
 
@@ -86,12 +81,10 @@ def menus_info(menu_id):
     if request.method == 'GET':
         menu = models.Menu.query.get_or_404(menu_id)
         if request.content_type == 'application/json':
-            dish_list = []
-            for dish in menu.dishes:
-                dish_list.append({
-                    'id': url_for('.dishes_info', dish_id=dish.id, _external=True),
-                    'name': dish.name
-                })
+            dish_list = [{
+                'id': url_for('.dishes_info', dish_id=dish.id, _external=True),
+                'name': dish.name
+                } for dish in menu.dishes]
 
             return jsonify(date=menu.date,
                            dishes=dish_list)
