@@ -69,13 +69,14 @@ def restos_info(resto_id):
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'DELETE'])
 def restos_menus(resto_id):
     if request.method == 'GET':
-        menus_result = []
+        per_page = 15
+        page = request.args.get('page', default=1, type=int)
 
-        menus = models.Menu.query.filter_by(resto_id=resto_id).all()
-        for menu in menus:
-            dishes = models.Dish.query.filter_by(menu_id=menu.id).all()
-            for dish in dishes:
-                pass
+        menus = models.Menu.query.order_by(models.Menu.date.desc()).paginate(page, per_page, error_out=False)
+        # for menu in menus:
+        #     dishes = 0
+        #     for dish in dishes:
+        #         pass
 
     elif request.method == 'DELETE':
         pass

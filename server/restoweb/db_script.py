@@ -1,4 +1,4 @@
-from restoweb import db
+from . import db
 from restoweb import models
 from datetime import time
 
@@ -68,7 +68,6 @@ schedules = [
 
         resto_id=3
     ),
-
 ]
 
 for resto in restos:
