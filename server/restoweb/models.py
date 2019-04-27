@@ -70,3 +70,6 @@ class Dish(db.Model):
     type = db.Column(db.String(30), nullable=False)
     price = db.Column(db.Float)
     diet = db.Column(db.String(50))
+
+    def get_info_url(self):
+        return url_for('.dishes_info', dish_id=self.id, _external=True)
