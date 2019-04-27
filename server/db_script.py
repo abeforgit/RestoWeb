@@ -1,19 +1,19 @@
 from restoweb import db
-from restoweb import models
+from restoweb.models import Resto, Schedule, Menu, Dish
 import datetime
 
 db.drop_all()
 db.create_all()
 
 restos = [
-    models.Resto(
+    Resto(
         name="Resto De Brug",
         zip_code="9000",
         city="Gent",
         address="Sint-Pietersnieuwstraat 45",
         campus="Campus Ufo"
     ),
-    models.Resto(
+    Resto(
         name="Resto Campus Sterre",
         zip_code="9000",
         city="Gent",
@@ -21,7 +21,7 @@ restos = [
         campus="Campus Sterre",
         description="De resto bevindt zich in gebouw S5."
     ),
-    models.Resto(
+    Resto(
         name="Resto Kantienberg",
         zip_code="9000",
         city="Gent",
@@ -31,33 +31,33 @@ restos = [
 ]
 
 schedules = [
-    models.Schedule(
+    Schedule(
         time_open=datetime.time(hour=11, minute=15),
         time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=1
     ),
-    models.Schedule(
+    Schedule(
         time_open=datetime.time(hour=17, minute=30),
         time_closed=datetime.time(hour=21, minute=0),
 
         resto_id=1
     ),
 
-    models.Schedule(
+    Schedule(
         time_open=datetime.time(hour=8, minute=0),
         time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=2
     ),
-    models.Schedule(
+    Schedule(
         time_open=datetime.time(hour=11, minute=15),
         time_closed=datetime.time(hour=14, minute=0),
 
         resto_id=2
     ),
 
-    models.Schedule(
+    Schedule(
         time_open=datetime.time(hour=11, minute=15),
         time_closed=datetime.time(hour=14, minute=0),
 
@@ -66,30 +66,29 @@ schedules = [
 ]
 
 menus = [
-    models.Menu(
+    Menu(
         date=datetime.date(2001, 5, 12),
         resto_id=1
     ),
 
-    models.Menu(
+    Menu(
         date=datetime.date(2019, 12, 31),
         resto_id=1
     )
 ]
 
-menus[0].dishes.append(models.Dish(
+menus[0].dishes.append(Dish(
     name="Hamburger",
     type="Vlees",
     price=1.50,
     diet="150+"
 ))
 
-menus[0].dishes.append(models.Dish(
+menus[0].dishes.append(Dish(
     name="Eend",
     type="Goor",
     price=17.95
 ))
-
 
 
 for resto in restos:
