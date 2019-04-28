@@ -1,5 +1,5 @@
 from restoweb import db
-from restoweb.models import Resto, Schedule, Menu, Dish
+from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 import datetime
 
 db.drop_all()
@@ -77,16 +77,21 @@ menus = [
     )
 ]
 
+dish_type = DishType(
+    name="Vlees"
+)
+
+
 menus[0].dishes.append(Dish(
     name="Hamburger",
-    type="Vlees",
+    type=dish_type,
     price=1.50,
     diet="150+"
 ))
 
 menus[0].dishes.append(Dish(
     name="Eend",
-    type="Goor",
+    type=dish_type,
     price=17.95
 ))
 

@@ -67,9 +67,17 @@ class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(50), nullable=False)
-    type = db.Column(db.String(30), nullable=False)
     price = db.Column(db.Float)
     diet = db.Column(db.String(50))
 
+    type_id = db.Column(db.Integer, db.ForeignKey('dish_type.id'))
+    type = db.relationship('DishType')
+
     def get_info_url(self):
         return url_for('.dishes_info', dish_id=self.id, _external=True)
+
+
+class DishType(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(30), nullable=False, unique=True)

@@ -18,7 +18,8 @@ app.config.update(dict(
     SQLALCHEMY_DATABASE_URI=f"sqlite:///{os.path.join(app.root_path, 'resto.db')}",
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     USERNAME='admin',
-    PASSWORD='default'
+    PASSWORD='default',
+    JSON_SORT_KEYS=False
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
