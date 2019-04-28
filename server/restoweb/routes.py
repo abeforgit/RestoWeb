@@ -14,6 +14,10 @@ def get_restos_url():
     return url_for('.restos', _external=True)
 
 
+def get_menus_url():
+    return url_for('.menus', _external=True)
+
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -159,14 +163,21 @@ def menus():
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
     if request.content_type == 'application/json':
-        dish_list = {
-            'url': menu.get_dishes_url()
-        }
+        dish_list = [{
+            'url': dish.get_info_url(),
+            'name': dish.name,
+            'price': dish.price,
+            'type': dish.type.name,
+            'diet': dish.diet
+        } for dish in menu.dishes]
 
         return jsonify(
             url=menu.get_info_url(),
 
-            dishes=dish_list
+            date=menu.date,
+            dishes=dish_list,
+
+            index=get_menus_url()
         )
 
 
@@ -177,7 +188,10 @@ def menus_dishes(menu_id):
         if request.content_type == 'application/json':
             dish_list = [{
                 'url': dish.get_info_url(),
-                'name': dish.name
+                'name': dish.name,
+                'price': dish.price,
+                'type': dish.type.name,
+                'diet': dish.diet
             } for dish in menu.dishes]
 
             menu_key = {
