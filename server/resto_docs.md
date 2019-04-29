@@ -117,7 +117,23 @@ Returns a list of menus
 ```
 
 ### POST
-//TODO
+Add a new menu
+
+**Header:** Content-Type: application/json
+**Body:**
+```
+{
+    "resto": {
+        "url": "https://groep22.webdev.ilabt.imec.be/restos/1"
+    },
+    "date": "Wed, 15 Sep 2017 00:00:00 GMT",
+    "dishes": [
+        {
+            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+        }
+    ]
+}
+```
 
 ## /menus/<int:menu_id>
 ### GET
@@ -167,7 +183,19 @@ Returns all dishes of the menu belonging to menu_id
 ```
 
 ### POST
-//TODO
+Add dishes to menu belonging to menu_id
+
+**Header:** Content-Type: application/json
+**Body:**
+```
+{
+    "dishes": [
+        {
+            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+        }
+    ]
+}
+```
 
 ### /dishes
 ### GET
