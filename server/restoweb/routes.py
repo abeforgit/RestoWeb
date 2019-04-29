@@ -42,10 +42,10 @@ def restos():
 
     elif request.method == 'POST':
         name = request.form['user']
-        zip_code = request.form['zip_code']
-        city = request.form['city']
-        address = request.form['address']
-        campus = request.form['campus']
+        zip_code = request.form['location']['zip_code']
+        city = request.form['location']['city']
+        address = request.form['location']['address']
+        campus = request.form['location']['campus']
         description = request.form['description']
 
         db.session.add(Resto(
@@ -132,11 +132,7 @@ def restos_menus(resto_id):
                 menus=menu_list
             )
     elif request.method == 'DELETE':
-        db_menus = db_menus_query.all()
-        db.session.delete(db_menus)
-        db.session.commit()
-
-        return f"All menus of {db_resto.name} deleted"
+        pass
 
 
 @app.route('/menus', methods=['GET', 'POST'])
@@ -153,7 +149,8 @@ def menus():
             } for menu in db_menus_paginate]
 
             return jsonify(
-                menus=menu_list
+                menus=menu_list,
+                home=get_home_url()
             )
     elif request.method == 'POST':
         pass
@@ -213,11 +210,17 @@ def dishes():
     if request.method == 'GET':
         if request.content_type == 'application/json':
             db_dishes = Dish.query.all()
-            dish_list = [{'name': dish.name,
-                          'url': dish.get_info_url()} for dish in db_dishes]
+            dish_list = [{
+                'url': dish.get_info_url(),
+                'name': dish.name,
+                'price': dish.price,
+                'type': dish.type.name,
+                'diet': dish.diet
+            } for dish in db_dishes]
 
             return jsonify(
-                dishes=dish_list
+                dishes=dish_list,
+                home=get_home_url()
             )
     elif request.method == 'POST':
         pass
@@ -229,16 +232,15 @@ def dishes_info(dish_id):
     if request.method == 'GET':
         if request.content_type == 'application/json':
             return jsonify(
+                url=dish.get_info_url(),
+
                 name=dish.name,
                 type=dish.type.name,
                 price=dish.price,
-                diet=dish.diet,
-
-                url=dish.get_info_url()
+                diet=dish.diet
             )
     elif request.method == 'DELETE':
         db.session.delete(dish)
     elif request.method == 'PUT':
         pass
     db.session.commit()
-
