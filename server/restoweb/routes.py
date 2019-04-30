@@ -27,18 +27,16 @@ def index():
 def restos():
     if request.method == 'GET':
         db_restos = Resto.query.all()
-        if request.content_type == 'application/json':
-            resto_list = [{
-                'name': resto.name,
-                'url': resto.get_info_url()
-            } for resto in db_restos]
 
-            return jsonify(
-                restos=resto_list,
-                home=get_home_url()
-            )
-        else:
-            return render_template("restos.html", resto_list=db_restos)
+        resto_list = [{
+            'name': resto.name,
+            'url': resto.get_info_url()
+        } for resto in db_restos]
+
+        return jsonify(
+            restos=resto_list,
+            home=get_home_url()
+        )
 
     elif request.method == 'POST':
         name = request.form['user']
@@ -67,36 +65,33 @@ def restos_info(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
     db_schedules = Schedule.query.filter_by(resto_id=resto_id).all()
     if request.method == 'GET':
-        if request.content_type == 'application/json':
-            schedule_result = [{
-                'time_open': schedule.time_open.isoformat(),
-                'time_closed': schedule.time_closed.isoformat()
-            } for schedule in db_schedules]
+        schedule_result = [{
+            'time_open': schedule.time_open.isoformat(),
+            'time_closed': schedule.time_closed.isoformat()
+        } for schedule in db_schedules]
 
-            location = {
-                'zip_code': db_resto.zip_code,
-                'city': db_resto.city,
-                'address': db_resto.address,
-                'campus': db_resto.campus
-            }
+        location = {
+            'zip_code': db_resto.zip_code,
+            'city': db_resto.city,
+            'address': db_resto.address,
+            'campus': db_resto.campus
+        }
 
-            menu_list = {
-                'url': db_resto.get_menus_url()
-            }
+        menu_list = {
+            'url': db_resto.get_menus_url()
+        }
 
-            return jsonify(
-                url=db_resto.get_info_url(),
+        return jsonify(
+            url=db_resto.get_info_url(),
 
-                name=db_resto.name,
-                description=db_resto.description,
-                location=location,
-                menus=menu_list,
-                schedules=schedule_result,
+            name=db_resto.name,
+            description=db_resto.description,
+            location=location,
+            menus=menu_list,
+            schedules=schedule_result,
 
-                index=get_restos_url()
-            )
-        else:
-            return render_template("restos_info.html", resto=db_resto, schedules=db_schedules)
+            index=get_restos_url()
+        )
 
     elif request.method == 'DELETE':
         db.session.delete(db_resto)
@@ -115,23 +110,24 @@ def restos_menus(resto_id):
         per_page = 15
 
         db_menus_paginate = db_menus_query.order_by(Menu.date.desc()).paginate(page, per_page, error_out=False).items
-        if request.content_type == 'application/json':
-            menu_list = [{
-                'url': menu.get_info_url(),
-                'date': menu.date
-            } for menu in db_menus_paginate]
+        menu_list = [{
+            'url': menu.get_info_url(),
+            'date': menu.date
+        } for menu in db_menus_paginate]
 
-            resto_key = {
-                'url': db_resto.get_info_url()
-            }
+        resto_key = {
+            'url': db_resto.get_info_url()
+        }
 
-            return jsonify(
-                url=db_resto.get_menus_url(),
+        return jsonify(
+            url=db_resto.get_menus_url(),
 
-                resto=resto_key,
-                menus=menu_list
-            )
+            resto=resto_key,
+            menus=menu_list
+        )
+
     elif request.method == 'DELETE':
+        # TODO
         pass
 
 
@@ -142,24 +138,49 @@ def menus():
         per_page = 15
 
         db_menus_paginate = Menu.query.order_by(Menu.date.desc()).paginate(page, per_page, error_out=False).items
-        if request.content_type == 'application/json':
-            menu_list = [{
-                'url': menu.get_info_url(),
-                'date': menu.date
-            } for menu in db_menus_paginate]
 
-            return jsonify(
-                menus=menu_list,
-                home=get_home_url()
-            )
+        menu_list = [{
+            'url': menu.get_info_url(),
+            'date': menu.date
+        } for menu in db_menus_paginate]
+
+        return jsonify(
+            menus=menu_list,
+            home=get_home_url()
+        )
+
     elif request.method == 'POST':
+        # TODO
         pass
 
 
 @app.route('/menus/<int:menu_id>')
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
-    if request.content_type == 'application/json':
+
+    dish_list = [{
+        'url': dish.get_info_url(),
+        'name': dish.name,
+        'price': dish.price,
+        'type': dish.type.name,
+        'diet': dish.diet
+    } for dish in menu.dishes]
+
+    return jsonify(
+        url=menu.get_info_url(),
+
+        date=menu.date,
+        dishes=dish_list,
+
+        index=get_menus_url()
+    )
+
+
+@app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
+def menus_dishes(menu_id):
+    if request.method == 'GET':
+        menu = Menu.query.get_or_404(menu_id)
+
         dish_list = [{
             'url': dish.get_info_url(),
             'name': dish.name,
@@ -168,61 +189,42 @@ def menus_info(menu_id):
             'diet': dish.diet
         } for dish in menu.dishes]
 
+        menu_key = {
+            'url': menu.get_info_url()
+        }
+
         return jsonify(
-            url=menu.get_info_url(),
+            url=menu.get_dishes_url(),
 
-            date=menu.date,
-            dishes=dish_list,
-
-            index=get_menus_url()
+            menu=menu_key,
+            dishes=dish_list
         )
 
-
-@app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
-def menus_dishes(menu_id):
-    if request.method == 'GET':
-        menu = Menu.query.get_or_404(menu_id)
-        if request.content_type == 'application/json':
-            dish_list = [{
-                'url': dish.get_info_url(),
-                'name': dish.name,
-                'price': dish.price,
-                'type': dish.type.name,
-                'diet': dish.diet
-            } for dish in menu.dishes]
-
-            menu_key = {
-                'url': menu.get_info_url()
-            }
-
-            return jsonify(
-                url=menu.get_dishes_url(),
-
-                menu=menu_key,
-                dishes=dish_list
-            )
     elif request.method == 'POST':
+        # TODO
         pass
 
 
 @app.route('/dishes', methods=['GET', 'POST'])
 def dishes():
     if request.method == 'GET':
-        if request.content_type == 'application/json':
-            db_dishes = Dish.query.all()
-            dish_list = [{
-                'url': dish.get_info_url(),
-                'name': dish.name,
-                'price': dish.price,
-                'type': dish.type.name,
-                'diet': dish.diet
-            } for dish in db_dishes]
+        db_dishes = Dish.query.all()
 
-            return jsonify(
-                dishes=dish_list,
-                home=get_home_url()
-            )
+        dish_list = [{
+            'url': dish.get_info_url(),
+            'name': dish.name,
+            'price': dish.price,
+            'type': dish.type.name,
+            'diet': dish.diet
+        } for dish in db_dishes]
+
+        return jsonify(
+            dishes=dish_list,
+            home=get_home_url()
+        )
+
     elif request.method == 'POST':
+        # TODO
         pass
 
 
@@ -230,17 +232,20 @@ def dishes():
 def dishes_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
-        if request.content_type == 'application/json':
-            return jsonify(
-                url=dish.get_info_url(),
+        return jsonify(
+            url=dish.get_info_url(),
 
-                name=dish.name,
-                type=dish.type.name,
-                price=dish.price,
-                diet=dish.diet
-            )
+            name=dish.name,
+            type=dish.type.name,
+            price=dish.price,
+            diet=dish.diet
+        )
+
     elif request.method == 'DELETE':
         db.session.delete(dish)
+
     elif request.method == 'PUT':
+        # TODO
         pass
+
     db.session.commit()
