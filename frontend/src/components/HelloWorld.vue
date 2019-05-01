@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-      <div>{{serverdata}}</div>
+      <div>{{ serverdata }}</div>
   </div>
 </template>
 
@@ -8,28 +8,27 @@
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import axios from 'axios';
-const URL = "https://test-cors.org";
+const URL = 'https://test-cors.org';
 
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
-  public serverdata: string = "";
+  public serverdata: string = '';
 
   created() {
       this.getData().then((result) => this.serverdata = result);
-
   }
 
   public async getData() {
       let res = await axios({
           baseURL: URL,
-          url: "/",
-          method: "get",
+          url: '/',
+          method: 'get',
 
 
           headers: {
-              "Access-Control-Allow-Origin": "*"
-          }
+              'Access-Control-Allow-Origin': '*',
+          },
       });
       return res.data;
   }

@@ -2,7 +2,8 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
+      <router-link to="/restos">Restos</router-link>
     </div>
     <router-view/>
   </div>
@@ -16,6 +17,7 @@
   text-align: center;
   color: #2c3e50;
 }
+
 #nav {
   padding: 30px;
   a {
@@ -27,3 +29,12 @@
   }
 }
 </style>
+
+<script>
+  import Navbar from './components/Navbar';
+  export default {
+    components: {
+      Navbar,
+    },
+  }
+</script>
