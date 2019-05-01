@@ -8,8 +8,12 @@ setup(
     install_requires=[
         'flask',
         'flask_sqlalchemy',
+        'flask_migrate',
+        'flask_bcrypt',
+        'flask-cors',
         'autopep8',
         'pre-commit',
+        'jinja2',
         'uwsgi'
     ],
 )
