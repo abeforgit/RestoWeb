@@ -92,8 +92,21 @@ Returns a list of menus of the resto belonging to resto_id
 }
 ```
 
-### DELETE
-//TODO
+### POST
+Add a new menu to this menu
+
+**Header:** Content-Type: application/json
+**Body:**
+```
+{
+    "date": "Wed, 15 Sep 2017 00:00:00 GMT",
+    "dishes": [
+        {
+            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+        }
+    ]
+}
+```
 
 ## /menus
 ### GET 

@@ -90,7 +90,7 @@ def restos_info(resto_id):
         return f"{db_resto.name} deleted"
 
 
-@app.route('/restos/<int:resto_id>/menus', methods=['GET', 'DELETE'])
+@app.route('/restos/<int:resto_id>/menus', methods=['GET', 'POST'])
 def restos_menus(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
     db_menus_query = Menu.query.filter_by(resto_id=db_resto.id)
@@ -115,9 +115,23 @@ def restos_menus(resto_id):
             menus=menu_list
         )
 
-    elif request.method == 'DELETE':
-        # TODO
-        pass
+    elif request.method == 'POST':
+        dishes = request.json["dishes"]
+
+        menu_date = request.json["date"]
+        menu_date_datetime = datetime.strptime(menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+
+        menu = Menu(
+            date=menu_date_datetime,
+            resto_id=db_resto.id
+        )
+
+        for dish in dishes:
+            menu.dishes.append(dish_from_url(dish["url"]))
+
+        db.session.add(menu)
+        db.session.commit()
+        return "Done"
 
 
 @app.route('/menus', methods=['GET', 'POST'])
