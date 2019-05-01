@@ -22,10 +22,5 @@
 </script>
 
 <style scoped>
-    . {
-        background-color: #fff;
-        min-height: 3.25rem;
-        position: relative;
-        z-index: 30;
-    }
+
 </style>

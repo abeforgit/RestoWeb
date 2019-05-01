@@ -8,7 +8,4 @@
 </script>
 
 <style>
-  h1 {
-    padding: 20px;
-  }
 </style>
