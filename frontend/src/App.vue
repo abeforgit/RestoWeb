@@ -1,12 +1,10 @@
 <template>
-  <div class="wrapper">
     <div class="container">
       <div id="app">
         <Navbar></Navbar>
         <router-view/>
       </div>
     </div>
-  </div>
 </template>
 
 <style lang="scss">
