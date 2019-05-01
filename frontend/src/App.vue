@@ -24,9 +24,10 @@
              url(assets/fonts/ugentpannotext-semilight-web.woff) format('woff');
     }
 
-    h1, h2, h3 {
+    h1, h2, h3, h4, h5, h6 {
         font-family: PannoTextMedium, sans-serif;
         margin: 10px 0;
+        font-weight: 500;
     }
 
     h1, h2 {
@@ -44,6 +45,19 @@
         font-size: 20px;
     }
 
+    ul li a, ol li a {
+        border-bottom: 1px solid transparent;
+    }
+
+    ul li a, ol li a {
+        border-bottom: 1px solid transparent;
+        color: #1E64C8;
+        text-decoration: none;
+        word-break: break-word;
+        transition: border-color .15s ease-in-out;
+        background-color: transparent;
+    }
+
     ul li, ol li {
         margin-bottom: 8px;
         position: relative;
@@ -52,11 +66,6 @@
     ul {
         list-style-type: none;
     }
-
-    ul li a, ol li a {
-        border-bottom: 1px solid transparent;
-    }
-
 
     ul li:before {
         content: "→";
@@ -73,6 +82,7 @@
         font-family: "PannoTextLight", Arial, sans-serif;
         font-size: 17px;
         line-height: 1.23529412;
+        color: #333;
     }
 </style>
 
