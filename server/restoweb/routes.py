@@ -4,19 +4,8 @@ from restoweb.models import Resto, Schedule, Menu, Dish
 from flask import render_template, url_for
 from flask import request
 from flask import jsonify
-
-
-def get_home_url():
-    return url_for('.index', _external=True)
-
-
-def get_restos_url():
-    return url_for('.restos', _external=True)
-
-
-def get_menus_url():
-    return url_for('.menus', _external=True)
-
+from datetime import datetime
+from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
 
 @app.route('/')
 def index():
@@ -150,8 +139,25 @@ def menus():
         )
 
     elif request.method == 'POST':
-        # TODO
-        pass
+        resto_url = request.json["resto"]["url"]
+        resto = resto_from_url(resto_url)
+
+        dishes = request.json["dishes"]
+
+        menu_date = request.json["date"]
+        menu_date_datetime = datetime.strptime(menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+
+        menu = Menu(
+            date=menu_date_datetime,
+            resto_id=resto.id
+        )
+
+        for dish in dishes:
+            menu.dishes.append(dish_from_url(dish["url"]))
+
+        db.session.add(menu)
+        db.session.commit()
+        return "Done"
 
 
 @app.route('/menus/<int:menu_id>')
@@ -166,11 +172,14 @@ def menus_info(menu_id):
         'diet': dish.diet
     } for dish in menu.dishes]
 
+    resto = Resto.query.get_or_404(menu.resto_id)
+
     return jsonify(
         url=menu.get_info_url(),
 
         date=menu.date,
         dishes=dish_list,
+        resto=resto.get_info_url(),
 
         index=get_menus_url()
     )
