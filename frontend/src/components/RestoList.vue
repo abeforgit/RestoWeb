@@ -14,7 +14,10 @@
         name: 'RestoList',
         data() {
             return {
-                info: null
+                info: null,
+                restos: [
+                    
+                ]
             }
         },
         mounted() {
