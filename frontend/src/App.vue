@@ -1,10 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> |
-      <router-link to="/restos">Restos</router-link>
-    </div>
+    <Navbar></Navbar>
     <router-view/>
   </div>
 </template>
@@ -17,24 +13,13 @@
   text-align: center;
   color: #2c3e50;
 }
-
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
 </style>
 
 <script>
-  import Navbar from './components/Navbar';
+  import Navbar from "./components/Navbar";
+  const URL = 'https://groep22.webdev.ilabt.imec.be';
+
   export default {
-    components: {
-      Navbar,
-    },
+    components: {Navbar}
   }
 </script>

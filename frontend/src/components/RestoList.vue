@@ -1,30 +1,35 @@
 <template>
     <div>
-        <li>
-
-        </li>
+        <h1>Studentenrestaurants</h1>
+        <ul>
+            <li v-for="resto in restos">
+                <router-link to='/about'>{{ resto.name }}</router-link>
+            </li>
+        </ul>
     </div>
 </template>
 
 <script>
     import axios from 'axios';
-    const URL = 'https://groep22.webdev.ilabt.imec.be';
+    import URL from '../App.vue'
 
     export default {
         name: 'RestoList',
+
         data() {
             return {
-                info: null,
-                restos: [
-                    
-                ]
+                restos: null,
             }
         },
-        mounted() {
-            axios
-                .get(URL + '/restos')
-                .then(response => (this.info = response))
-        }
+
+        async created() {
+            try {
+                const response = await axios.get('http://localhost:5000/restos');
+                this.restos = response.data.restos
+            } catch (e) {
+                console.log("Unable to fetch restos")
+            }
+        },
     }
 </script>
 

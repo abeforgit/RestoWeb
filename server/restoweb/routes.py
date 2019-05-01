@@ -1,9 +1,6 @@
-from restoweb import app
-from restoweb import db
+from restoweb import app, db
 from restoweb.models import Resto, Schedule, Menu, Dish
-from flask import render_template, url_for
-from flask import request
-from flask import jsonify
+from flask import render_template, url_for, request, jsonify
 
 
 def get_home_url():
