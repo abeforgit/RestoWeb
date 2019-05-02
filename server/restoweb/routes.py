@@ -39,12 +39,12 @@ def restos():
         )
 
     elif request.method == 'POST':
-        name = request.form['user']
-        zip_code = request.form['location']['zip_code']
-        city = request.form['location']['city']
-        address = request.form['location']['address']
-        campus = request.form['location']['campus']
-        description = request.form['description']
+        name = request.json['name']
+        zip_code = request.json['location']['zip_code']
+        city = request.json['location']['city']
+        address = request.json['location']['address']
+        campus = request.json['location']['campus']
+        description = request.json['description']
 
         db.session.add(Resto(
             name=name,
