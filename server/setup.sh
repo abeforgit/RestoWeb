@@ -2,3 +2,4 @@
 python3.7 -m venv venv
 . venv/bin/activate
 pip3 install -e .
+flask db upgrade
