@@ -53,6 +53,8 @@ def signup():
     else:
         return render_template("signup.html")
 
+
 @app.route('/logout')
 def logout():
+    # TODO
     return 'Logout'

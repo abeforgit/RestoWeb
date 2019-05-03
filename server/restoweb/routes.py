@@ -1,9 +1,10 @@
-from restoweb import app
-from restoweb import db
+from restoweb import app, db, login_manager
 from restoweb.models import Resto, Schedule, Menu, Dish
+from flask_login import current_user
 from flask import render_template, url_for
 from flask import request
 from flask import jsonify
+
 
 
 def get_home_url():
@@ -21,6 +22,11 @@ def get_menus_url():
 @app.route('/')
 def index():
     return render_template("index.html")
+
+
+def check_admin():
+    return current_user.is_authenticated and current_user.admin
+
 
 
 @app.route('/restos', methods=['GET', 'POST'])
@@ -94,11 +100,15 @@ def restos_info(resto_id):
         )
 
     elif request.method == 'DELETE':
-        db.session.delete(db_resto)
-        db.session.delete(db_schedules)
-        db.session.commit()
+        if check_admin():
+            db.session.delete(db_resto)
+            for s in db_schedules:
+                db.session.delete(s)
+            db.session.commit()
 
-        return f"{db_resto.name} deleted"
+            return f"{db_resto.name} deleted"
+        else:
+            return login_manager.unauthorized()
 
 
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'DELETE'])
@@ -242,7 +252,10 @@ def dishes_info(dish_id):
         )
 
     elif request.method == 'DELETE':
-        db.session.delete(dish)
+        if check_admin():
+            db.session.delete(dish)
+        else:
+            return login_manager.unauthorized()
 
     elif request.method == 'PUT':
         # TODO

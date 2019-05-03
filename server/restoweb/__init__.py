@@ -28,7 +28,9 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db, render_as_batch=True)
 CORS(app)
-
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 
 
 env = Environment(
@@ -39,11 +41,6 @@ env = Environment(
 import restoweb.routes
 import restoweb.error_routes
 import restoweb.models
-
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.init_app(app)
-
 
 @login_manager.user_loader
 def load_user(user_id):
