@@ -201,9 +201,8 @@ def menus_info(menu_id):
 
 @app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
 def menus_dishes(menu_id):
+    menu = Menu.query.get_or_404(menu_id)
     if request.method == 'GET':
-        menu = Menu.query.get_or_404(menu_id)
-
         dish_list = [{
             'url': dish.get_info_url(),
             'name': dish.name,
@@ -224,8 +223,9 @@ def menus_dishes(menu_id):
         )
 
     elif request.method == 'POST':
-        # TODO
-        pass
+        for dish in request.json["dishes"]:
+            menu.dishes.append(dish_from_url(dish.url))
+        return "Done"
 
 
 @app.route('/dishes', methods=['GET', 'POST'])
