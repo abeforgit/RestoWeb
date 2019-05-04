@@ -1,6 +1,6 @@
 from restoweb import app
 from restoweb import db
-from restoweb.models import Resto, Schedule, Menu, Dish
+from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask import render_template, url_for
 from flask import request
 from flask import jsonify
@@ -228,9 +228,20 @@ def dishes():
         )
 
     elif request.method == 'POST':
-        # TODO
-        pass
+        dish_name = request.json["name"]
+        dish_price = float(request.json["price"])
+        dish_diet = request.json["diet"]
+        dish_type_str = request.json["type"]
 
+        dish_type = DishType.query.filter_by(name = dish_type_str).first()
+        if dish_type == None:
+            dish_type = DishType(name=dish_type_str)
+            db.session.add(dish_type)
+
+        dish = Dish(name=dish_name, price=dish_price, diet=dish_diet, type=dish_type)
+        db.session.add(dish)
+        db.session.commit()
+        return "Done"
 
 @app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE', 'PUT'])
 def dishes_info(dish_id):
@@ -247,9 +258,4 @@ def dishes_info(dish_id):
 
     elif request.method == 'DELETE':
         db.session.delete(dish)
-
-    elif request.method == 'PUT':
-        # TODO
-        pass
-
     db.session.commit()
