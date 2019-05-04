@@ -92,8 +92,21 @@ Returns a list of menus of the resto belonging to resto_id
 }
 ```
 
-### DELETE
-//TODO
+### POST
+Add a new menu to this menu
+
+**Header:** Content-Type: application/json
+**Body:**
+```
+{
+    "date": "Wed, 15 Sep 2017 00:00:00 GMT",
+    "dishes": [
+        {
+            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+        }
+    ]
+}
+```
 
 ## /menus
 ### GET 
@@ -113,25 +126,6 @@ Returns a list of menus
         }
     ],
     "home": "https://groep22.webdev.ilabt.imec.be/"
-}
-```
-
-### POST
-Add a new menu
-
-**Header:** Content-Type: application/json
-**Body:**
-```
-{
-    "resto": {
-        "url": "https://groep22.webdev.ilabt.imec.be/restos/1"
-    },
-    "date": "Wed, 15 Sep 2017 00:00:00 GMT",
-    "dishes": [
-        {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
-        }
-    ]
 }
 ```
 
@@ -157,6 +151,9 @@ Returns the menu belonging to menu_id
     "index": "https://groep22.webdev.ilabt.imec.be/menus"
 }
 ```
+
+### DELETE
+Delete the menu belonging to menu_id
 
 ## /menus/<int:menu_id>/dishes
 ### GET
@@ -219,7 +216,18 @@ Returns a list of all dishes
 ```
 
 ### POST
-//TODO
+Add a dish
+
+**Header:** Content-Type: application/json
+**Body:**
+```
+{
+    "name": "Hamburger",
+    "price": 1.5,
+    "type": "Vlees",
+    "diet": "75"
+}
+```
 
 ## /dishes/<int:dish_id>
 ### GET
@@ -239,6 +247,3 @@ Returns information of dish belonging to dish_id
 
 ### DELETE
 Deletes the dish belonging to dish_id  
-
-### PUT
-//TODO
