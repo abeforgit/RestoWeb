@@ -134,7 +134,7 @@ def restos_menus(resto_id):
         return "Done"
 
 
-@app.route('/menus', methods=['GET', 'POST'])
+@app.route('/menus', methods=['GET'])
 def menus():
     if request.method == 'GET':
         page = request.args.get('page', default=1, type=int)
@@ -151,28 +151,6 @@ def menus():
             menus=menu_list,
             home=get_home_url()
         )
-
-    elif request.method == 'POST':
-        resto_url = request.json["resto"]["url"]
-        resto = resto_from_url(resto_url)
-
-        dishes = request.json["dishes"]
-
-        menu_date = request.json["date"]
-        menu_date_datetime = datetime.strptime(menu_date, '%a, %d %b %Y %H:%M:%S %Z')
-
-        menu = Menu(
-            date=menu_date_datetime,
-            resto_id=resto.id
-        )
-
-        for dish in dishes:
-            menu.dishes.append(dish_from_url(dish["url"]))
-
-        db.session.add(menu)
-        db.session.commit()
-        return "Done"
-
 
 @app.route('/menus/<int:menu_id>')
 def menus_info(menu_id):
