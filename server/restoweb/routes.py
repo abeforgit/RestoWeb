@@ -152,30 +152,33 @@ def menus():
             home=get_home_url()
         )
 
-@app.route('/menus/<int:menu_id>')
+@app.route('/menus/<int:menu_id>', methods=['GET', 'DELETE'])
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
+    if request.method == "GET":
+        dish_list = [{
+            'url': dish.get_info_url(),
+            'name': dish.name,
+            'price': dish.price,
+            'type': dish.type.name,
+            'diet': dish.diet
+        } for dish in menu.dishes]
 
-    dish_list = [{
-        'url': dish.get_info_url(),
-        'name': dish.name,
-        'price': dish.price,
-        'type': dish.type.name,
-        'diet': dish.diet
-    } for dish in menu.dishes]
+        resto = Resto.query.get_or_404(menu.resto_id)
 
-    resto = Resto.query.get_or_404(menu.resto_id)
+        return jsonify(
+            url=menu.get_info_url(),
 
-    return jsonify(
-        url=menu.get_info_url(),
+            date=menu.date,
+            dishes=dish_list,
+            resto=resto.get_info_url(),
 
-        date=menu.date,
-        dishes=dish_list,
-        resto=resto.get_info_url(),
-
-        index=get_menus_url()
-    )
-
+            index=get_menus_url()
+        )
+    elif request.method == "DELETE":
+        db.session.delete(menu)
+        db.session.commit()
+        return "Done"
 
 @app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
 def menus_dishes(menu_id):
