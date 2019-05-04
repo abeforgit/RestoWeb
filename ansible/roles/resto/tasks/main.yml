@@ -27,7 +27,6 @@
   args:
     chdir: /home/resto/RestoWeb/server
     executable: /bin/bash
-    creates: /home/resto/RestoWeb/server/venv
   become_user: resto
 
 - name: Install systemd unit file
@@ -36,4 +35,4 @@
       dest: /etc/systemd/system/restoweb.service
 
 - name: Start restoweb
-  systemd: state=started name=restoweb daemon_reload=yes
+  systemd: state=restarted name=restoweb daemon_reload=yes
