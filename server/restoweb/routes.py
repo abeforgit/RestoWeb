@@ -26,12 +26,12 @@ def restos():
         )
 
     elif request.method == 'POST':
-        name = request.form['user']
-        zip_code = request.form['location']['zip_code']
-        city = request.form['location']['city']
-        address = request.form['location']['address']
-        campus = request.form['location']['campus']
-        description = request.form['description']
+        name = request.json['name']
+        zip_code = request.json['location']['zip_code']
+        city = request.json['location']['city']
+        address = request.json['location']['address']
+        campus = request.json['location']['campus']
+        description = request.json['description']
 
         db.session.add(Resto(
             name=name,
@@ -82,7 +82,6 @@ def restos_info(resto_id):
 
     elif request.method == 'DELETE':
         db.session.delete(db_resto)
-        db.session.delete(db_schedules)
         db.session.commit()
 
         return Response(status=200)
@@ -203,7 +202,8 @@ def menus_dishes(menu_id):
 
     elif request.method == 'POST':
         for dish in request.json["dishes"]:
-            menu.dishes.append(dish_from_url(dish.url))
+            menu.dishes.append(dish_from_url(dish["url"]))
+        db.session.commit()
         return Response(status=200)
 
 
@@ -256,5 +256,5 @@ def dishes_info(dish_id):
 
     elif request.method == 'DELETE':
         db.session.delete(dish)
+        db.session.commit()
         return Response(status=200)
-    db.session.commit()
