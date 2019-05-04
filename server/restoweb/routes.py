@@ -1,9 +1,7 @@
 from restoweb import app
 from restoweb import db
 from restoweb.models import Resto, Schedule, Menu, Dish, DishType
-from flask import render_template, url_for
-from flask import request
-from flask import jsonify
+from flask import render_template, url_for, request, jsonify, Response
 from datetime import datetime
 from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
 
@@ -46,7 +44,7 @@ def restos():
 
         db.session.commit()
 
-        return f"{name} added"
+        return Response(status=201)
 
 
 @app.route('/restos/<int:resto_id>', methods=['GET', 'DELETE'])
@@ -87,7 +85,7 @@ def restos_info(resto_id):
         db.session.delete(db_schedules)
         db.session.commit()
 
-        return f"{db_resto.name} deleted"
+        return Response(status=200)
 
 
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'POST'])
@@ -131,7 +129,7 @@ def restos_menus(resto_id):
 
         db.session.add(menu)
         db.session.commit()
-        return "Done"
+        return Response(status=201)
 
 
 @app.route('/menus', methods=['GET'])
@@ -178,7 +176,7 @@ def menus_info(menu_id):
     elif request.method == "DELETE":
         db.session.delete(menu)
         db.session.commit()
-        return "Done"
+        return Response(status=200)
 
 @app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
 def menus_dishes(menu_id):
@@ -206,7 +204,7 @@ def menus_dishes(menu_id):
     elif request.method == 'POST':
         for dish in request.json["dishes"]:
             menu.dishes.append(dish_from_url(dish.url))
-        return "Done"
+        return Response(status=200)
 
 
 @app.route('/dishes', methods=['GET', 'POST'])
@@ -241,9 +239,9 @@ def dishes():
         dish = Dish(name=dish_name, price=dish_price, diet=dish_diet, type=dish_type)
         db.session.add(dish)
         db.session.commit()
-        return "Done"
+        return Response(status=201)
 
-@app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE'])
 def dishes_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
@@ -258,4 +256,5 @@ def dishes_info(dish_id):
 
     elif request.method == 'DELETE':
         db.session.delete(dish)
+        return Response(status=200)
     db.session.commit()
