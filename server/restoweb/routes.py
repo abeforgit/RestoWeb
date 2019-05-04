@@ -1,9 +1,10 @@
 from restoweb import app, db, login_manager
 from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask_login import current_user
-from flask import render_template, url_for, request, jsonify, Response
+from flask import render_template, request, jsonify, Response
 from datetime import datetime
 from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
+import math
 
 
 @app.route('/')
@@ -102,7 +103,7 @@ def restos_menus(resto_id):
     db_menus_query = Menu.query.filter_by(resto_id=db_resto.id)
     if request.method == 'GET':
         page = request.args.get('page', default=1, type=int)
-        per_page = 15
+        per_page = 10
 
         db_menus_paginate = db_menus_query.order_by(
             Menu.date.desc()).paginate(page, per_page, error_out=False).items
@@ -115,11 +116,24 @@ def restos_menus(resto_id):
             'url': db_resto.get_info_url()
         }
 
+        menu_amount = db_menus_query.count()
+        total_pages = math.ceil(menu_amount / per_page)
+        meta = {
+            'page': {
+                'number': page,
+                'limit': per_page,
+                'total_pages': total_pages,
+                'total_menus': menu_amount
+            }
+        }
+
         return jsonify(
             url=db_resto.get_menus_url(),
 
             resto=resto_key,
-            menus=menu_list
+            menus=menu_list,
+
+            meta=meta
         )
 
     elif request.method == 'POST':
@@ -146,9 +160,10 @@ def restos_menus(resto_id):
 def menus():
     if request.method == 'GET':
         page = request.args.get('page', default=1, type=int)
-        per_page = 15
+        per_page = 10
 
-        db_menus_paginate = Menu.query.order_by(Menu.date.desc()).paginate(
+        db_menu_query = Menu.query
+        db_menus_paginate = db_menu_query.order_by(Menu.date.desc()).paginate(
             page, per_page, error_out=False).items
 
         menu_list = [{
@@ -156,9 +171,22 @@ def menus():
             'date': menu.date
         } for menu in db_menus_paginate]
 
+        menu_amount = db_menu_query.count()
+        total_pages = math.ceil(menu_amount / per_page)
+        meta = {
+            'page': {
+                'number': page,
+                'limit': per_page,
+                'total_pages': total_pages,
+                'total_menus': menu_amount
+            }
+        }
+
         return jsonify(
             menus=menu_list,
-            home=get_home_url()
+            home=get_home_url(),
+
+            meta=meta
         )
 
 
