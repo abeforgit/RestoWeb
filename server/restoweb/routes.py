@@ -1,13 +1,18 @@
-from restoweb import app
-from restoweb import db
+from restoweb import app, db, login_manager
 from restoweb.models import Resto, Schedule, Menu, Dish, DishType
+from flask_login import current_user
 from flask import render_template, url_for, request, jsonify, Response
 from datetime import datetime
 from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
 
+
 @app.route('/')
 def index():
     return render_template("index.html")
+
+
+def check_admin():
+    return current_user.is_authenticated and current_user.admin
 
 
 @app.route('/restos', methods=['GET', 'POST'])
@@ -81,11 +86,14 @@ def restos_info(resto_id):
         )
 
     elif request.method == 'DELETE':
-        db.session.delete(db_resto)
-        db.session.delete(db_schedules)
-        db.session.commit()
-
-        return Response(status=200)
+        if check_admin():
+            db.session.delete(db_resto)
+            for s in db_schedules:
+                db.session.delete(s)
+            db.session.commit()
+            return Response(status=200)
+        else:
+            return login_manager.unauthorized()
 
 
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'POST'])
@@ -96,7 +104,8 @@ def restos_menus(resto_id):
         page = request.args.get('page', default=1, type=int)
         per_page = 15
 
-        db_menus_paginate = db_menus_query.order_by(Menu.date.desc()).paginate(page, per_page, error_out=False).items
+        db_menus_paginate = db_menus_query.order_by(
+            Menu.date.desc()).paginate(page, per_page, error_out=False).items
         menu_list = [{
             'url': menu.get_info_url(),
             'date': menu.date
@@ -117,7 +126,8 @@ def restos_menus(resto_id):
         dishes = request.json["dishes"]
 
         menu_date = request.json["date"]
-        menu_date_datetime = datetime.strptime(menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+        menu_date_datetime = datetime.strptime(
+            menu_date, '%a, %d %b %Y %H:%M:%S %Z')
 
         menu = Menu(
             date=menu_date_datetime,
@@ -138,7 +148,8 @@ def menus():
         page = request.args.get('page', default=1, type=int)
         per_page = 15
 
-        db_menus_paginate = Menu.query.order_by(Menu.date.desc()).paginate(page, per_page, error_out=False).items
+        db_menus_paginate = Menu.query.order_by(Menu.date.desc()).paginate(
+            page, per_page, error_out=False).items
 
         menu_list = [{
             'url': menu.get_info_url(),
@@ -149,6 +160,7 @@ def menus():
             menus=menu_list,
             home=get_home_url()
         )
+
 
 @app.route('/menus/<int:menu_id>', methods=['GET', 'DELETE'])
 def menus_info(menu_id):
@@ -177,6 +189,7 @@ def menus_info(menu_id):
         db.session.delete(menu)
         db.session.commit()
         return Response(status=200)
+
 
 @app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
 def menus_dishes(menu_id):
@@ -231,15 +244,17 @@ def dishes():
         dish_diet = request.json["diet"]
         dish_type_str = request.json["type"]
 
-        dish_type = DishType.query.filter_by(name = dish_type_str).first()
+        dish_type = DishType.query.filter_by(name=dish_type_str).first()
         if dish_type == None:
             dish_type = DishType(name=dish_type_str)
             db.session.add(dish_type)
 
-        dish = Dish(name=dish_name, price=dish_price, diet=dish_diet, type=dish_type)
+        dish = Dish(name=dish_name, price=dish_price,
+                    diet=dish_diet, type=dish_type)
         db.session.add(dish)
         db.session.commit()
         return Response(status=201)
+
 
 @app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE'])
 def dishes_info(dish_id):
@@ -255,6 +270,9 @@ def dishes_info(dish_id):
         )
 
     elif request.method == 'DELETE':
-        db.session.delete(dish)
+        if check_admin():
+            db.session.delete(dish)
+        else:
+            return login_manager.unauthorized()
         return Response(status=200)
     db.session.commit()

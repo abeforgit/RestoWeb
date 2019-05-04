@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Signup
+{% endblock %}
+
+{% block content %}
+    <form id="signup" action="/signup" method="post">
+        <input type="text" name="username" value="">
+        <input type="password" name="password" value="">
+    </form>
+    <button type="submit" form="signup" value="Submit">Submit</button>
+{% endblock %}

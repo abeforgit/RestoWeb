@@ -1,12 +1,14 @@
 from flask import url_for
+from flask_login import UserMixin
 from restoweb import db
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
+    admin = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class Resto(db.Model):
