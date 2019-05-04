@@ -11,10 +11,12 @@ setup(
         'flask_migrate',
         'flask_bcrypt',
         'flask-cors',
+        'flask-testing',
         'autopep8',
         'pre-commit',
         'jinja2',
         'uwsgi',
-        'flask_login'
+        'flask_login',
+        'pytest'
     ],
 )
