@@ -1,6 +1,14 @@
 from flask import url_for
 from flask_login import UserMixin
 from restoweb import db
+import random
+import string
+
+
+def generate_api_token(size=32):
+    return ''.join(
+        random.SystemRandom().choice(string.ascii_letters + string.digits)
+        for _ in range(size))
 
 
 class User(db.Model, UserMixin):
@@ -9,6 +17,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    apikey = db.Column(db.String(32), nullable=False, default=generate_api_token)
 
 
 class Resto(db.Model):
