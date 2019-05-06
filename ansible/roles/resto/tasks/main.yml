@@ -22,6 +22,31 @@
         - python3.7-venv
     state: present
 
+- name: Check out the frontend repo
+  local_action:
+    module: git
+    repo: https://github.com/abeforgit/RestoWeb-Front
+    dest: /tmp/restoweb-front
+    version: development
+
+- name: Install packages from Restoweb-Front
+  local_action:
+    module: yarn
+    path: /tmp/restoweb-front
+
+- name: Run yarn build
+  local_action:
+    module: shell
+    _raw_params: yarn run build
+    chdir: /tmp/restoweb-front
+
+- name: Copy over dist folder
+  copy:
+    src: /tmp/restoweb-front/dist/
+    dest: /home/resto/public/
+    owner: www-data
+
+
 - name: Setup restoweb software
   shell: /home/resto/RestoWeb/server/setup.sh
   args:

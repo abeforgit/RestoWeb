@@ -15,6 +15,13 @@ server {
     listen 443 ssl http2;
     server_name groep22.webdev.ilabt.imec.be;
     location / {
+        root /home/resto/public;
+        try_files $uri $uri/ /index.html;
+        include  /etc/nginx/mime.types;
+    }
+
+    location /api {
+        rewrite ^/api(.*)$ $1 break;
         include uwsgi_params;
         uwsgi_pass unix:/home/resto/RestoWeb/server/restoweb.sock;
     }
