@@ -57,7 +57,7 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        return jsonify({"token": new_user.apikey})
+        return jsonify({"token": new_user.apikey}), 201
 
 
 @app.route('/logout', methods=['POST'])
