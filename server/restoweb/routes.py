@@ -125,6 +125,7 @@ def restos_info(resto_id):
         else:
             return Response(status=401)
 
+
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'POST'])
 def restos_menus(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
@@ -135,6 +136,7 @@ def restos_menus(resto_id):
 
         db_menus_paginate = db_menus_query.order_by(
             Menu.date.desc()).paginate(page, per_page, error_out=False).items
+
         menu_list = [{
             'url': menu.get_info_url()
         } for menu in db_menus_paginate]
@@ -195,22 +197,24 @@ def restos_menus(resto_id):
 @app.route('/restos/<int:resto_id>/latestmenu')
 def restos_latestmenu(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
-    db_menu = Menu.query.filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first()
+    db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first()
 
-    resto_key = {
-        'url': db_resto.get_info_url()
-    }
-
-    menu = {
-        'url': db_menu.get_info_url(),
-        'date': db_menu.date
-    }
+    dish_list = [{
+        'url': dish.get_info_url(),
+        'name': dish.name,
+        'price': dish.price,
+        'type': dish.type.name,
+        'diet': dish.diet
+    } for dish in db_menu.dishes]
 
     return jsonify(
-        url=db_resto.get_menus_url(),
+        url=db_menu.get_info_url(),
 
-        resto=resto_key,
-        menu=menu
+        date=db_menu.date,
+        dishes=dish_list,
+        resto=db_resto.get_info_url(),
+
+        index=get_menus_url()
     )
 
 
