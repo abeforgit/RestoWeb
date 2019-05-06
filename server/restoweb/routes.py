@@ -32,6 +32,8 @@ def restos():
         )
 
     elif request.method == 'POST':
+        if (not request.json):
+            return Response(status=400)
         name = request.json['name']
         zip_code = request.json['location']['zip_code']
         city = request.json['location']['city']
@@ -102,6 +104,8 @@ def restos_info(resto_id):
     
     elif request.method == 'PUT':
         if check_admin():
+            if (not request.json):
+                return Response(status=400)
             db_resto.name = request.json['name']
             db_resto.zip_code = request.json['location']['zip_code']
             db_resto.city = request.json['location']['city']
@@ -153,6 +157,9 @@ def restos_menus(resto_id):
         )
 
     elif request.method == 'POST':
+        if (not request.json):
+            return Response(status=400)
+
         dishes = request.json["dishes"]
 
         menu_date = request.json["date"]
@@ -238,6 +245,9 @@ def menus_info(menu_id):
 
     elif request.method == "PUT":
         if check_admin():
+            if (not request.json):
+                return Response(status=400)
+
             dishes = request.json["dishes"]
 
             menu_date = request.json["date"]
@@ -279,6 +289,9 @@ def menus_dishes(menu_id):
         )
 
     elif request.method == 'POST':
+        if (not request.json):
+            return Response(status=400)
+
         for dish in request.json["dishes"]:
             menu.dishes.append(dish_from_url(dish["url"]))
         db.session.commit()
@@ -304,6 +317,9 @@ def dishes():
         )
 
     elif request.method == 'POST':
+        if (not request.json):
+            return Response(status=400)
+
         dish_name = request.json["name"]
         dish_price = float(request.json["price"])
         dish_diet = request.json["diet"]
@@ -346,6 +362,9 @@ def dishes_info(dish_id):
 
     elif request.method == "PUT":
         if check_admin():
+            if (not request.json):
+                return Response(status=400)
+                
             dish_name = request.json["name"]
             dish_price = float(request.json["price"])
             dish_diet = request.json["diet"]
