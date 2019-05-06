@@ -199,7 +199,9 @@ Body:
             "url": String
         }
     ],
-    "resto": String,
+    "resto": {
+      "url": String
+    },
     "index": String
 }
 ```
