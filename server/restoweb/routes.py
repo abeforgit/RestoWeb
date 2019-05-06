@@ -207,12 +207,16 @@ def restos_latestmenu(resto_id):
         'diet': dish.diet
     } for dish in db_menu.dishes]
 
+    resto_key = {
+        'url': db_resto.get_info_url()
+    }
+
     return jsonify(
         url=db_menu.get_info_url(),
 
         date=db_menu.date,
         dishes=dish_list,
-        resto=db_resto.get_info_url(),
+        resto=resto_key,
 
         index=get_menus_url()
     )
@@ -256,6 +260,8 @@ def menus():
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
     if request.method == "GET":
+        resto = Resto.query.get_or_404(menu.resto_id)
+
         dish_list = [{
             'url': dish.get_info_url(),
             'name': dish.name,
@@ -264,14 +270,16 @@ def menus_info(menu_id):
             'diet': dish.diet
         } for dish in menu.dishes]
 
-        resto = Resto.query.get_or_404(menu.resto_id)
+        resto_key = {
+            'url': resto.get_info_url()
+        }
 
         return jsonify(
             url=menu.get_info_url(),
 
             date=menu.date,
             dishes=dish_list,
-            resto=resto.get_info_url(),
+            resto=resto_key,
 
             index=get_menus_url()
         )
