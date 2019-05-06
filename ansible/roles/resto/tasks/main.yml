@@ -37,8 +37,9 @@
 - name: Run yarn build
   local_action:
     module: shell
-    _raw_params: yarn run build
+    _raw_params: "VUE_APP_API_URL='https://groep22.webdev.ilabt.imec.be' yarn run build"
     chdir: /tmp/restoweb-front
+
 
 - name: Copy over dist folder
   copy:
