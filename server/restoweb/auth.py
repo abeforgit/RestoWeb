@@ -6,7 +6,9 @@ from flask_login import login_user, logout_user, current_user
 
 @login_manager.request_loader
 def load_user_from_request(r):
-    apikey = r.headers.get('Token')
+    # Authorization: Token ABCDEFGHIJKLMNOPQRSTUVWXYZ012345
+    tokenheader = r.headers.get('Authorization')
+    apikey = tokenheader.split()[-1] if tokenheader else None
     if apikey:
         user = User.query.filter_by(apikey=apikey).first()
         if user:
