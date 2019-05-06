@@ -156,6 +156,28 @@ def restos_menus(resto_id):
         return Response(status=201)
 
 
+@app.route('/restos/<int:resto_id>/latestmenu')
+def restos_latestmenu(resto_id):
+    db_resto = Resto.query.get_or_404(resto_id)
+    db_menu = Menu.query.filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first()
+
+    resto_key = {
+        'url': db_resto.get_info_url()
+    }
+
+    menu = {
+        'url': db_menu.get_info_url(),
+        'date': db_menu.date
+    }
+
+    return jsonify(
+        url=db_resto.get_menus_url(),
+
+        resto=resto_key,
+        menu=menu
+    )
+
+
 @app.route('/menus', methods=['GET'])
 def menus():
     if request.method == 'GET':
