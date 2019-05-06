@@ -201,10 +201,6 @@ def restos_latestmenu(resto_id):
 
     dish_list = [{
         'url': dish.get_info_url(),
-        'name': dish.name,
-        'price': dish.price,
-        'type': dish.type.name,
-        'diet': dish.diet
     } for dish in db_menu.dishes]
 
     resto_key = {
@@ -264,10 +260,6 @@ def menus_info(menu_id):
 
         dish_list = [{
             'url': dish.get_info_url(),
-            'name': dish.name,
-            'price': dish.price,
-            'type': dish.type.name,
-            'diet': dish.diet
         } for dish in menu.dishes]
 
         resto_key = {
