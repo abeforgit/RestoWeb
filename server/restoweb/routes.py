@@ -39,18 +39,22 @@ def restos():
         campus = request.json['location']['campus']
         description = request.json['description']
 
-        db.session.add(Resto(
+        resto = Resto(
             name=name,
             zip_code=zip_code,
             city=city,
             address=address,
             campus=campus,
             description=description
-        ))
+        )
+
+        db.session.add(resto)
 
         db.session.commit()
 
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": resto.get_info_url()
+        })
 
 
 @app.route('/restos/<int:resto_id>', methods=['GET', 'DELETE'])
@@ -153,7 +157,9 @@ def restos_menus(resto_id):
 
         db.session.add(menu)
         db.session.commit()
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": menu.get_info_url()
+        })
 
 
 @app.route('/menus', methods=['GET'])
@@ -282,7 +288,9 @@ def dishes():
                     diet=dish_diet, type=dish_type)
         db.session.add(dish)
         db.session.commit()
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": dish.get_info_url()
+        })
 
 
 @app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE'])
