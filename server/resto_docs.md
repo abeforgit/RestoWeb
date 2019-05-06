@@ -1,249 +1,338 @@
-# RESTO API DOCUMENTATION
-https://groep22.webdev.ilabt.imec.be/
+# Documentation
 
 ## /restos
-### GET
-Returns a list of all restos
 
-**Header:** Content-Type: application/json  
-**Response**:  
-```
+### GET
+
+#### Response
+
+- Body (200):
+
+```json
 {
-    restos: [
-        { "name": "Resto Example",
-          "url": "https://groep22.webdev.ilabt.imec.be/restos/1"
-        }
-    ]
-    home: https://groep22.webdev.ilabt.imec.be/
+  "restos": [
+    {
+      "name": String,
+      "url": String,
+    }
+  ],
+  "home": String
 }
 ```
 
 ### POST
-Adds a new resto  
-**Header:** Content-Type: application/json  
-**Body**:  
-```
+
+#### Request
+
+- Header: `Content-Type: application/json`
+- Body:
+
+```json
 {
-    "name": "Resto Example",
-    "description": "Description example"
+    "name": String,
     "location": {
-        "zip_code": "0000",
-        "city": "City example",
-        "address": "Address example",
-        "campus": "Campus example"
-    }
+        "zip_code": String,
+        "city": String,
+        "address": String,
+        "campus": String
+    },
+    "description": String
 }
 ```
 
-## /restos/<int:resto_id>
-### GET 
-Returns all information of the resto belonging to resto_id
+#### Response
 
-**Header:** Content-Type: application/json  
-**Response:** 
-```
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 201 (with `location` header): if Resto is created (at the url in the `location`-header)
+
+## /restos/(id)
+
+### GET
+
+#### Response
+
+- 404: if not found
+- 200 (with body): if found
+
+Body:
+```json
 {
-    "url": "https://groep22.webdev.ilabt.imec.be/restos/1"
-    "name": "Resto Example",
-    "description": "Description example",
+    "url": String,
+    "name": String,
+    "description": String,
     "location": {
-        "zip_code": "0000",
-        "city": "City example",
-        "address": "Address example",
-        "campus": "Campus example"
-    }
-   "menus": {
-        "url": "https://groep22.webdev.ilabt.imec.be/restos/1/menus"
+        "zip_code": String,
+        "city": String,
+        "address": String,
+        "campus": String
+    },
+    "menus": {
+        "url": String
     },
     "schedules": [
         {
-            "time_open": "11:15:00",
-            "time_closed": "14:00:00"
+            "time_open": String,
+            "time_closed": String
         }
     ],
-    "index": "https://groep22.webdev.ilabt.imec.be/restos"
+    "index": String
 }
 ```
 
 ### DELETE
-Deletes the resto belonging to resto_id
 
-## /restos/<int:resto_id>/menus
+#### Response
+
+- 404: if not found
+- 401: if not logged in or not authorized
+- 200: if succesfully deleted
+
+### PUT
+
+Identical to `POST /menus`, except 404 if not found
+
+## /restos/(id)/menus
+
 ### GET
-Returns a list of menus of the resto belonging to resto_id
 
-**Header:** Content-Type: application/json
-**Parameters:**: 
-- page (default=1)  
+Add `?page=X` for page X
 
-**Response:**
-```
+#### Response
+
+- 404: if not found
+- 200 (with body): if found
+
+Body:
+
+```json
 {
-    "url": "https://groep22.webdev.ilabt.imec.be/1/menus",
+    "url": String,
     "resto": {
-        "url": "https://groep22.webdev.ilabt.imec.be/restos/1"
+        "url": String
     },
     "menus": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/menus/1",
-            "date": "Tue, 31 Dec 2019 00:00:00 GMT"
+            "url": String
         }
-    ]
+    ],
+    "meta": {
+        "page": {
+            "number": Integer,
+            "limit": Integer,
+            "total_pages": Integer,
+            "total_menus": Integer
+        }
+    }
 }
 ```
 
 ### POST
-Add a new menu to this menu
 
-**Header:** Content-Type: application/json
-**Body:**
-```
+#### Request
+
+- Header: `Content-Type: application/json`
+- Body:
+
+```json
 {
-    "date": "Wed, 15 Sep 2017 00:00:00 GMT",
+    "date": String (Formatted like "Mon, 6 May 2019 00:00:00 GMT"),
     "dishes": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+            "url": String
         }
     ]
 }
 ```
+
+#### Response
+
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 201 (with `location` header): if Resto is created (at the url in the `location`-header)
 
 ## /menus
-### GET 
-Returns a list of menus
 
-**Header:** Content-Type: application/json  
-**Parameters:**:  
-- page (default=1)  
+### GET
 
-**Response:**
-```
+Add `?page=X` for page X
+
+#### Response
+
+```json
 {
     "menus": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/menus/1",
-            "date": "Tue, 31 Dec 2019 00:00:00 GMT"
+            "url": String,
+            "date": String
         }
     ],
-    "home": "https://groep22.webdev.ilabt.imec.be/"
+    "home": String,
+    "meta": {
+        "page": {
+            "number": Integer,
+            "limit": Integer,
+            "total_pages": Integer,
+            "total_menus": Integer
+        }
+    }
 }
 ```
 
-## /menus/<int:menu_id>
-### GET
-Returns the menu belonging to menu_id
+## /menus/(id)
 
-**Header:** Content-Type: application/json  
-**Response:**
-```
+### GET
+
+#### Response
+
+- 404: if not found
+- 200 (with body): if found
+
+Body:
+
+```json
 {
-    "url": "https://groep22.webdev.ilabt.imec.be/menus/1",
-    "date": "Sat, 12 May 2001 00:00:00 GMT",
+    "url": String,
+    "date": String (Formatted like "Mon, 6 May 2019 00:00:00 GMT"),
     "dishes": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1",
-            "name": "Hamburger",
-            "price": 1.5,
-            "type": "Vlees",
-            "diet": "75"
+            "url": String
         }
     ],
-    "index": "https://groep22.webdev.ilabt.imec.be/menus"
+    "resto": String,
+    "index": String
 }
 ```
 
 ### DELETE
-Delete the menu belonging to menu_id
 
-## /menus/<int:menu_id>/dishes
+#### Response
+
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 200: if Menu is deleted
+
+### PUT
+
+Identical to `POST /menus`, except 404 if not found
+
+## /menus/(id)/dishes
+
 ### GET
-Returns all dishes of the menu belonging to menu_id
 
-**Header:** Content-Type: application/json  
-**Response:**
-```
+#### Response
+
+- 404: if not found
+- 200 (with body): if found
+
+Body:
+
+```json
 {
-    "url": "https://groep22.webdev.ilabt.imec.be/menus/1/dishes",
+    "url": String,
     "menu": {
-        "url": "https://groep22.webdev.ilabt.imec.be/menus/1"
+        "url": String
     },
-    "dishes": [
-        {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1",
-            "name": "Hamburger",
-            "price": 1.5,
-            "type": "Vlees",
-            "diet": "75"
-        }
-    ]
+    "dishes": [{
+        "url": String,
+        "name": String,
+        "price": String,
+        "type": String,
+        "diet": String
+    }]
 }
 ```
 
 ### POST
-Add dishes to menu belonging to menu_id
 
-**Header:** Content-Type: application/json
-**Body:**
-```
+#### Request
+
+- Header: `Content-Type: application/json`
+- Body:
+
+```json
 {
     "dishes": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1"
+            "url": String
         }
     ]
 }
 ```
 
-### /dishes
-### GET
-Returns a list of all dishes  
+#### Response
 
-**Header:** Content-Type: application/json  
-**Response:**
-```
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 201 (with `location` header): if Resto is created (at the url in the `location`-header)
+
+## /dishes
+
+### GET
+
+#### Response
+
+```json
 {
-     "dishes": [
+    "dishes": [
         {
-            "url": "https://groep22.webdev.ilabt.imec.be/dishes/1",
-            "name": "Hamburger",
-            "price": 1.5,
-            "type": "Vlees",
-            "diet": "75"
+            "url": String,
+            "name": String,
+            "price": Float,
+            "type": String,
+            "diet": String
         }
     ],
-    "home": "https://groep22.webdev.ilabt.imec.be/"
+    "home": String
 }
 ```
 
 ### POST
-Add a dish
 
-**Header:** Content-Type: application/json
-**Body:**
-```
+#### Request
+
+- Header: `Content-Type: application/json`
+- Body:
+
+```json
 {
-    "name": "Hamburger",
-    "price": 1.5,
-    "type": "Vlees",
-    "diet": "75"
+    "name": String,
+    "price": Float,
+    "diet": String,
+    "type": String
 }
 ```
 
-## /dishes/<int:dish_id>
-### GET
-Returns information of dish belonging to dish_id
+#### Response
 
-**Header:** Content-Type: application/json  
-**Response:**
-```
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 201 (with `location` header): if Resto is created (at the url in the `location`-header)
+
+## /dishes/(id)
+
+### GET
+
+#### Response
+
+```json
 {
-    "url": "https://groep22.webdev.ilabt.imec.be/dishes/1",
-    "name": "Hamburger",
-    "price": 1.5,
-    "type": "Vlees",
-    "diet": "75"  
+    "url": String,
+    "name": String,
+    "type": String,
+    "price": Float,
+    "diet": String
 }
 ```
 
 ### DELETE
-Deletes the dish belonging to dish_id  
+
+#### Response
+
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 200: if Dish is deleted
+
+### PUT
+
+Identical to `POST /dishes`, except 404 if not found

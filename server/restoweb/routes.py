@@ -1,4 +1,4 @@
-from restoweb import app, db, login_manager
+from restoweb import app, db
 from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
@@ -32,28 +32,39 @@ def restos():
         )
 
     elif request.method == 'POST':
-        name = request.json['name']
-        zip_code = request.json['location']['zip_code']
-        city = request.json['location']['city']
-        address = request.json['location']['address']
-        campus = request.json['location']['campus']
-        description = request.json['description']
+        if not check_admin():
+            return Response(status=401)
+        if (not request.json):
+            return Response(status=400)
+        try:
+            name = request.json['name']
+            zip_code = request.json['location']['zip_code']
+            city = request.json['location']['city']
+            address = request.json['location']['address']
+            campus = request.json['location']['campus']
+            description = request.json['description']
+        except:
+            return Response(status=400)
 
-        db.session.add(Resto(
+        resto = Resto(
             name=name,
             zip_code=zip_code,
             city=city,
             address=address,
             campus=campus,
             description=description
-        ))
+        )
+
+        db.session.add(resto)
 
         db.session.commit()
 
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": resto.get_info_url()
+        })
 
 
-@app.route('/restos/<int:resto_id>', methods=['GET', 'DELETE'])
+@app.route('/restos/<int:resto_id>', methods=['GET', 'DELETE', 'PUT'])
 def restos_info(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
     db_schedules = Schedule.query.filter_by(resto_id=resto_id).all()
@@ -94,8 +105,25 @@ def restos_info(resto_id):
             db.session.commit()
             return Response(status=200)
         else:
-            return login_manager.unauthorized()
-
+            return Response(status=401)
+    
+    elif request.method == 'PUT':
+        if check_admin():
+            if (not request.json):
+                return Response(status=400)
+            try:
+                db_resto.name = request.json['name']
+                db_resto.zip_code = request.json['location']['zip_code']
+                db_resto.city = request.json['location']['city']
+                db_resto.address = request.json['location']['address']
+                db_resto.campus = request.json['location']['campus']
+                db_resto.description = request.json['description']
+            except:
+                return Response(status=400)
+            db.session.commit()
+            return Response(status=200)
+        else:
+            return Response(status=401)
 
 @app.route('/restos/<int:resto_id>/menus', methods=['GET', 'POST'])
 def restos_menus(resto_id):
@@ -108,8 +136,7 @@ def restos_menus(resto_id):
         db_menus_paginate = db_menus_query.order_by(
             Menu.date.desc()).paginate(page, per_page, error_out=False).items
         menu_list = [{
-            'url': menu.get_info_url(),
-            'date': menu.date
+            'url': menu.get_info_url()
         } for menu in db_menus_paginate]
 
         resto_key = {
@@ -137,12 +164,19 @@ def restos_menus(resto_id):
         )
 
     elif request.method == 'POST':
-        dishes = request.json["dishes"]
+        if not check_admin():
+            return Response(status=401)
+        if (not request.json):
+            return Response(status=400)
 
-        menu_date = request.json["date"]
-        menu_date_datetime = datetime.strptime(
-            menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+        try:
+            dishes = request.json["dishes"]
 
+            menu_date = request.json["date"]
+            menu_date_datetime = datetime.strptime(
+                menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+        except:
+            return Response(status=400)
         menu = Menu(
             date=menu_date_datetime,
             resto_id=db_resto.id
@@ -153,7 +187,9 @@ def restos_menus(resto_id):
 
         db.session.add(menu)
         db.session.commit()
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": menu.get_info_url()
+        })
 
 
 @app.route('/restos/<int:resto_id>/latestmenu')
@@ -212,7 +248,7 @@ def menus():
         )
 
 
-@app.route('/menus/<int:menu_id>', methods=['GET', 'DELETE'])
+@app.route('/menus/<int:menu_id>', methods=['GET', 'DELETE', 'PUT'])
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
     if request.method == "GET":
@@ -236,9 +272,35 @@ def menus_info(menu_id):
             index=get_menus_url()
         )
     elif request.method == "DELETE":
+        if not check_admin():
+            return Response(status=401)
         db.session.delete(menu)
         db.session.commit()
         return Response(status=200)
+
+    elif request.method == "PUT":
+        if check_admin():
+            if (not request.json):
+                return Response(status=400)
+
+            try:
+                dishes = request.json["dishes"]
+
+                menu_date = request.json["date"]
+                menu_date_datetime = datetime.strptime(
+                    menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+            except:
+                return Response(status=400)
+
+            menu.date = menu_date_datetime
+
+            for dish in dishes:
+                if dish_from_url(dish["url"]) not in menu.dishes:
+                    menu.dishes.append(dish_from_url(dish["url"]))
+            
+            return Response(status=200)
+        else:
+            return Response(status=401)
 
 
 @app.route('/menus/<int:menu_id>/dishes', methods=['GET', 'POST'])
@@ -265,7 +327,17 @@ def menus_dishes(menu_id):
         )
 
     elif request.method == 'POST':
-        for dish in request.json["dishes"]:
+        if not check_admin():
+            return Response(status=401)
+        if (not request.json):
+            return Response(status=400)
+        
+        try:
+            dishes = request.json["dishes"]
+        except:
+            return Response(status=400)
+
+        for dish in dishes:
             menu.dishes.append(dish_from_url(dish["url"]))
         db.session.commit()
         return Response(status=200)
@@ -290,10 +362,18 @@ def dishes():
         )
 
     elif request.method == 'POST':
-        dish_name = request.json["name"]
-        dish_price = float(request.json["price"])
-        dish_diet = request.json["diet"]
-        dish_type_str = request.json["type"]
+        if not check_admin():
+            return Response(status=401)
+        if (not request.json):
+            return Response(status=400)
+
+        try:
+            dish_name = request.json["name"]
+            dish_price = float(request.json["price"])
+            dish_diet = request.json["diet"]
+            dish_type_str = request.json["type"]
+        except:
+            return Response(status=400)
 
         dish_type = DishType.query.filter_by(name=dish_type_str).first()
         if dish_type == None:
@@ -304,10 +384,12 @@ def dishes():
                     diet=dish_diet, type=dish_type)
         db.session.add(dish)
         db.session.commit()
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": dish.get_info_url()
+        })
 
 
-@app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE'])
+@app.route('/dishes/<int:dish_id>', methods=['GET', 'DELETE', 'PUT'])
 def dishes_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
@@ -323,7 +405,34 @@ def dishes_info(dish_id):
     elif request.method == 'DELETE':
         if check_admin():
             db.session.delete(dish)
+            db.session.commit()
+            return Response(status=200)
         else:
-            return login_manager.unauthorized()
-        return Response(status=200)
-    db.session.commit()
+            return Response(status=401)
+
+    elif request.method == "PUT":
+        if check_admin():
+            if (not request.json):
+                return Response(status=400)
+
+            try:
+                dish_name = request.json["name"]
+                dish_price = float(request.json["price"])
+                dish_diet = request.json["diet"]
+                dish_type_str = request.json["type"]
+            except:
+                return Response(status=400)
+
+            dish_type = DishType.query.filter_by(name=dish_type_str).first()
+            if dish_type == None:
+                dish_type = DishType(name=dish_type_str)
+                db.session.add(dish_type)
+
+            dish.name = dish_name
+            dish.price = dish_price
+            dish.diet = dish_diet
+            dish.type = dish_type
+            db.session.commit()
+            return Response(status=200)
+        else:
+            return Response(status=401)
