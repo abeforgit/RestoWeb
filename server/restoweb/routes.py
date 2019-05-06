@@ -128,8 +128,7 @@ def restos_menus(resto_id):
         db_menus_paginate = db_menus_query.order_by(
             Menu.date.desc()).paginate(page, per_page, error_out=False).items
         menu_list = [{
-            'url': menu.get_info_url(),
-            'date': menu.date
+            'url': menu.get_info_url()
         } for menu in db_menus_paginate]
 
         resto_key = {
@@ -364,7 +363,7 @@ def dishes_info(dish_id):
         if check_admin():
             if (not request.json):
                 return Response(status=400)
-                
+
             dish_name = request.json["name"]
             dish_price = float(request.json["price"])
             dish_diet = request.json["diet"]
