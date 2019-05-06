@@ -1,4 +1,4 @@
-from restoweb import app, db, login_manager
+from restoweb import app, db
 from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
@@ -32,6 +32,8 @@ def restos():
         )
 
     elif request.method == 'POST':
+        if not check_admin():
+            return Response(status=401)
         if (not request.json):
             return Response(status=400)
         name = request.json['name']
@@ -156,6 +158,8 @@ def restos_menus(resto_id):
         )
 
     elif request.method == 'POST':
+        if not check_admin():
+            return Response(status=401)
         if (not request.json):
             return Response(status=400)
 
@@ -238,6 +242,8 @@ def menus_info(menu_id):
             index=get_menus_url()
         )
     elif request.method == "DELETE":
+        if not check_admin():
+            return Response(status=401)
         db.session.delete(menu)
         db.session.commit()
         return Response(status=200)
@@ -288,6 +294,8 @@ def menus_dishes(menu_id):
         )
 
     elif request.method == 'POST':
+        if not check_admin():
+            return Response(status=401)
         if (not request.json):
             return Response(status=400)
 
@@ -316,6 +324,8 @@ def dishes():
         )
 
     elif request.method == 'POST':
+        if not check_admin():
+            return Response(status=401)
         if (not request.json):
             return Response(status=400)
 
