@@ -36,12 +36,15 @@ def restos():
             return Response(status=401)
         if (not request.json):
             return Response(status=400)
-        name = request.json['name']
-        zip_code = request.json['location']['zip_code']
-        city = request.json['location']['city']
-        address = request.json['location']['address']
-        campus = request.json['location']['campus']
-        description = request.json['description']
+        try:
+            name = request.json['name']
+            zip_code = request.json['location']['zip_code']
+            city = request.json['location']['city']
+            address = request.json['location']['address']
+            campus = request.json['location']['campus']
+            description = request.json['description']
+        except:
+            return Response(status=400)
 
         resto = Resto(
             name=name,
@@ -108,12 +111,15 @@ def restos_info(resto_id):
         if check_admin():
             if (not request.json):
                 return Response(status=400)
-            db_resto.name = request.json['name']
-            db_resto.zip_code = request.json['location']['zip_code']
-            db_resto.city = request.json['location']['city']
-            db_resto.address = request.json['location']['address']
-            db_resto.campus = request.json['location']['campus']
-            db_resto.description = request.json['description']
+            try:
+                db_resto.name = request.json['name']
+                db_resto.zip_code = request.json['location']['zip_code']
+                db_resto.city = request.json['location']['city']
+                db_resto.address = request.json['location']['address']
+                db_resto.campus = request.json['location']['campus']
+                db_resto.description = request.json['description']
+            except:
+                return Response(status=400)
             db.session.commit()
             return Response(status=200)
         else:
@@ -163,12 +169,14 @@ def restos_menus(resto_id):
         if (not request.json):
             return Response(status=400)
 
-        dishes = request.json["dishes"]
+        try:
+            dishes = request.json["dishes"]
 
-        menu_date = request.json["date"]
-        menu_date_datetime = datetime.strptime(
-            menu_date, '%a, %d %b %Y %H:%M:%S %Z')
-
+            menu_date = request.json["date"]
+            menu_date_datetime = datetime.strptime(
+                menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+        except:
+            return Response(status=400)
         menu = Menu(
             date=menu_date_datetime,
             resto_id=db_resto.id
@@ -253,11 +261,14 @@ def menus_info(menu_id):
             if (not request.json):
                 return Response(status=400)
 
-            dishes = request.json["dishes"]
+            try:
+                dishes = request.json["dishes"]
 
-            menu_date = request.json["date"]
-            menu_date_datetime = datetime.strptime(
-                menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+                menu_date = request.json["date"]
+                menu_date_datetime = datetime.strptime(
+                    menu_date, '%a, %d %b %Y %H:%M:%S %Z')
+            except:
+                return Response(status=400)
 
             menu.date = menu_date_datetime
 
@@ -298,8 +309,13 @@ def menus_dishes(menu_id):
             return Response(status=401)
         if (not request.json):
             return Response(status=400)
+        
+        try:
+            dishes = request.json["dishes"]
+        except:
+            return Response(status=400)
 
-        for dish in request.json["dishes"]:
+        for dish in dishes:
             menu.dishes.append(dish_from_url(dish["url"]))
         db.session.commit()
         return Response(status=200)
@@ -329,10 +345,13 @@ def dishes():
         if (not request.json):
             return Response(status=400)
 
-        dish_name = request.json["name"]
-        dish_price = float(request.json["price"])
-        dish_diet = request.json["diet"]
-        dish_type_str = request.json["type"]
+        try:
+            dish_name = request.json["name"]
+            dish_price = float(request.json["price"])
+            dish_diet = request.json["diet"]
+            dish_type_str = request.json["type"]
+        except:
+            return Response(status=400)
 
         dish_type = DishType.query.filter_by(name=dish_type_str).first()
         if dish_type == None:
@@ -374,10 +393,13 @@ def dishes_info(dish_id):
             if (not request.json):
                 return Response(status=400)
 
-            dish_name = request.json["name"]
-            dish_price = float(request.json["price"])
-            dish_diet = request.json["diet"]
-            dish_type_str = request.json["type"]
+            try:
+                dish_name = request.json["name"]
+                dish_price = float(request.json["price"])
+                dish_diet = request.json["diet"]
+                dish_type_str = request.json["type"]
+            except:
+                return Response(status=400)
 
             dish_type = DishType.query.filter_by(name=dish_type_str).first()
             if dish_type == None:
