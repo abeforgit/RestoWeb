@@ -1,5 +1,5 @@
 ---
-- name: Shoot school!
+- name: Deploy Restoweb
   hosts: school
   user: root
 
