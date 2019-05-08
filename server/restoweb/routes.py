@@ -477,7 +477,9 @@ def ratings_info(dish_id):
         current_user.ratings.append(rating)
         db.session.add(rating)
         db.session.commit()
-        return Response(status=201)
+        return Response(status=201, headers={
+            "Location": rating.get_rating_url()
+        })
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def user_info(user_id):
