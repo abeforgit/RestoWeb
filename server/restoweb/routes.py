@@ -477,7 +477,7 @@ def ratings_info(dish_id):
         current_user.ratings.append(rating)
         db.session.add(rating)
         db.session.commit()
-        return Response(status=200)
+        return Response(status=201)
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def user_info(user_id):
@@ -503,11 +503,29 @@ def ratings():
             } for rating in Rating.query.all()]
         )
 
-@app.route('/ratings/<int:rating_id>', methods=['GET'])
+@app.route('/ratings/<int:rating_id>', methods=['GET', 'DELETE', 'PUT'])
 def rating_info(rating_id):
     rating = Rating.query.get_or_404(rating_id)
-    return jsonify(
-                rating=rating.rating,
-                dish=rating.dish.get_info_url(),
-                user=rating.user.get_info_url(),
-            )
+    if request.method == 'GET':
+        return jsonify(
+                    rating=rating.rating,
+                    dish=rating.dish.get_info_url(),
+                    user=rating.user.get_info_url(),
+                )
+    elif request.method == 'DELETE':
+        db.session.delete(rating)
+        db.session.commit()
+        return Response(status=200)
+    elif request.method == 'PUT':
+        if not request.json:
+            return Response(status=400)
+
+        try:
+            new_rating = request.json["rating"]
+        except:
+            return Response(status=400)
+
+        rating.rating = new_rating
+        db.session.commit()
+        return Response(status=200)
+
