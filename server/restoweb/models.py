@@ -19,6 +19,9 @@ class User(db.Model, UserMixin):
     admin = db.Column(db.Boolean, nullable=False, default=False)
     apikey = db.Column(db.String(32), nullable=False, default=generate_api_token)
     ratings = db.relationship('Rating', backref='user', lazy=True)
+    
+    def get_info_url(self):
+        return url_for('.user_info', user_id=self.id, _external=True)
 
 
 class Resto(db.Model):
@@ -103,4 +106,4 @@ class Rating(db.Model):
     rating = db.Column(db.Integer, nullable=False)
 
     def get_rating_url(self):
-        return url_for('.rating_info', menu_id=self.id, _external=True)
+        return url_for('.rating_info', rating_id=self.id, _external=True)
