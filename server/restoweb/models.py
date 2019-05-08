@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120), nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     apikey = db.Column(db.String(32), nullable=False, default=generate_api_token)
+    ratings = db.relationship('Rating', backref='user', lazy=True)
 
 
 class Resto(db.Model):
@@ -80,6 +81,7 @@ class Dish(db.Model):
     name = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float)
     diet = db.Column(db.String(50))
+    ratings = db.relationship('Rating', backref='dish', lazy=True)
 
     type_id = db.Column(db.Integer, db.ForeignKey('dish_type.id'))
     type = db.relationship('DishType')
@@ -92,3 +94,13 @@ class DishType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(30), nullable=False, unique=True)
+
+class Rating(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+
+    dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    rating = db.Column(db.Integer, nullable=False)
+
+    def get_rating_url(self):
+        return url_for('.rating_info', menu_id=self.id, _external=True)

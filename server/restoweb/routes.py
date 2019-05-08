@@ -440,3 +440,11 @@ def dishes_info(dish_id):
             return Response(status=200)
         else:
             return Response(status=401)
+
+@app.route('/dishes/<int:dish_id>/ratings', methods=['GET', 'POST'])
+def ratings_info(dish_id):
+    dish = Dish.query.get_or_404(dish_id)
+    if request.method == 'GET':
+        return jsonify(
+           ratings=dish.ratings
+        )
