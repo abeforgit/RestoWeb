@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from restoweb import db
 import random
 import string
+from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url, inject_context
 
 
 def generate_api_token(size=32):
@@ -41,6 +42,45 @@ class Resto(db.Model):
     def get_menus_url(self):
         return url_for('.restos_menus', resto_id=self.id, _external=True)
 
+    def serialize_full(self):
+        db_schedules = Schedule.query.filter_by(resto_id=self.id).all()
+        schedule_result = [{
+            'time_open': schedule.time_open.isoformat(),
+            'time_closed': schedule.time_closed.isoformat()
+        } for schedule in db_schedules]
+
+        location = {
+            'zip_code': self.zip_code,
+            'city': self.city,
+            'address': self.address,
+            'campus': self.campus
+        }
+
+        menu_list = {
+            'url': self.get_menus_url()
+        }
+
+        return {
+            '@type': 'schema:Restaurant',
+            'url': self.get_info_url(),
+            'name': self.name,
+            'description': self.description,
+            'location': location,
+            'menus': menu_list,
+            'schedules': schedule_result,
+            'index': get_restos_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "name": "schema:name",
+            "description": "scheme:description",
+            "menus": "scheme:hasMenu"
+        }
+
 
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,6 +112,28 @@ class Menu(db.Model):
 
     def get_dishes_url(self):
         return url_for('.menus_dishes', menu_id=self.id, _external=True)
+
+    def serialize_full(self):
+        dish_list = [{'url': dish.get_info_url()} for dish in self.dishes]
+        return {
+            '@type': 'schema:Menu',
+            'url': self.get_info_url(),
+
+            'date': self.date,
+            'dishes': dish_list,
+            'resto': {
+                'url': Resto.query.get_or_404(self.resto_id).get_info_url(),
+            },
+            'index': get_menus_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "dishes": "schema:hasMenuItem",
+            }
 
 
 class Dish(db.Model):
