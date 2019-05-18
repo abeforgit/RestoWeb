@@ -37,3 +37,7 @@ def dish_from_url(url):
             return dish
         except:
             return None
+
+def inject_context(d, context):
+    d['@context'] = context
+    return d

@@ -3,7 +3,7 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
+from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url, inject_context
 import math
 
 
@@ -106,7 +106,7 @@ def restos_info(resto_id):
             return Response(status=200)
         else:
             return Response(status=401)
-    
+
     elif request.method == 'PUT':
         if check_admin():
             if (not request.json):
@@ -301,7 +301,7 @@ def menus_info(menu_id):
             for dish in dishes:
                 if dish_from_url(dish["url"]) not in menu.dishes:
                     menu.dishes.append(dish_from_url(dish["url"]))
-            
+
             return Response(status=200)
         else:
             return Response(status=401)
@@ -335,7 +335,7 @@ def menus_dishes(menu_id):
             return Response(status=401)
         if (not request.json):
             return Response(status=400)
-        
+
         try:
             dishes = request.json["dishes"]
         except:
@@ -352,18 +352,12 @@ def dishes():
     if request.method == 'GET':
         db_dishes = Dish.query.all()
 
-        dish_list = [{
-            'url': dish.get_info_url(),
-            'name': dish.name,
-            'price': dish.price,
-            'type': dish.type.name,
-            'diet': dish.diet
-        } for dish in db_dishes]
+        dish_list = [dish.serialize() for dish in db_dishes]
 
-        return jsonify(
-            dishes=dish_list,
-            home=get_home_url()
-        )
+        return jsonify(inject_context({
+            'dishes': dish_list,
+            'home': get_home_url()
+        }, Dish.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -398,12 +392,7 @@ def dishes_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
         return jsonify(
-            url=dish.get_info_url(),
-
-            name=dish.name,
-            type=dish.type.name,
-            price=dish.price,
-            diet=dish.diet
+            inject_context(dish.serialize(), Dish.get_context())
         )
 
     elif request.method == 'DELETE':

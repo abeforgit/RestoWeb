@@ -87,6 +87,26 @@ class Dish(db.Model):
     def get_info_url(self):
         return url_for('.dishes_info', dish_id=self.id, _external=True)
 
+    def serialize(self):
+        return {
+            '@type': 'schema:MenuItem',
+            'url': self.get_info_url(),
+            'name': self.name,
+            'price': self.price,
+            # TODO suitableForDiet
+            'type': self.type.name,
+            'diet': self.diet
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "name": "schema:name",
+            "price": "schema:offers:price",
+            }
+
 
 class DishType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
