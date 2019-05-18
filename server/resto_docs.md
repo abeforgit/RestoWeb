@@ -323,7 +323,11 @@ Body:
     "name": String,
     "type": String,
     "price": Float,
-    "diet": String
+    "diet": String,
+    "ratings": [{
+          "rating": Integer,
+          "user": String
+    }]
 }
 ```
 
@@ -338,3 +342,98 @@ Body:
 ### PUT
 
 Identical to `POST /dishes`, except 404 if not found
+
+## /dishes/(id)/ratings
+
+### GET
+
+#### Response
+
+```json
+{
+    "ratings": [{
+        "rating": Integer,
+        "user": String,
+        "dish": String
+    }]
+}
+```
+
+### POST
+
+#### Request
+
+- Header: `Content-Type: application/json`
+- Body:
+
+```json
+{
+  "rating": Integer
+}
+```
+
+#### Response
+
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 201 (with `location` header): if Resto is created (at the url in the `location`-header)
+
+## /ratings
+
+### GET
+
+#### Response
+
+```json
+{
+    "ratings": {
+       "rating": Integer,
+       "dish": String,
+       "url": String
+    }
+}
+```
+
+
+## /ratings/(id)
+
+### GET
+
+#### Response
+
+```json
+{
+   "rating": Integer,
+   "dish": String,
+   "url": String
+}
+```
+
+### DELETE
+
+- 400: if no json body is supplied (TODO or header is missing keys)
+- 401: if not logged in or not authorized
+- 200: if Rating is deleted
+
+### PUT
+
+Identical to `POST /ratings`, except 404 if not found
+
+## /users/(id)
+
+### GET
+
+#### Response
+
+```json
+{
+  username: String,
+  ratings: [
+    {
+      rating: Integer,
+      dish: String,
+      url: String
+    }
+  ]
+}
+```

@@ -1,9 +1,10 @@
 from restoweb import app, db
-from restoweb.models import Resto, Schedule, Menu, Dish, DishType
+from restoweb.models import Resto, Schedule, Menu, Dish, DishType, Rating, User
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
 from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
+from restoweb.auth import load_user_from_request
 import math
 
 
@@ -403,7 +404,11 @@ def dishes_info(dish_id):
             name=dish.name,
             type=dish.type.name,
             price=dish.price,
-            diet=dish.diet
+            diet=dish.diet,
+            ratings=[{
+                "rating": rating.rating,
+                "user": rating.user.get_info_url()
+            } for rating in dish.ratings]
         )
 
     elif request.method == 'DELETE':
@@ -440,3 +445,89 @@ def dishes_info(dish_id):
             return Response(status=200)
         else:
             return Response(status=401)
+
+@app.route('/dishes/<int:dish_id>/ratings', methods=['GET', 'POST'])
+def ratings_info(dish_id):
+    dish = Dish.query.get_or_404(dish_id)
+    if request.method == 'GET':
+        return jsonify(
+           ratings=[{
+                "rating": rating.rating,
+                "user": rating.user.get_info_url(),
+                "url": rating.get_rating_url()
+
+            } for rating in dish.ratings]
+        )
+    elif request.method == 'POST':
+        if not request.json:
+            return Response(status=400)
+        
+        try:
+            rating = int(request.json['rating'])
+        except:
+            return Response(status=400)
+
+        if rating > 5 or rating < 1:
+            return Response(status=400)
+
+        rating = Rating(
+                rating=rating
+            )
+        dish.ratings.append(rating)
+        current_user.ratings.append(rating)
+        db.session.add(rating)
+        db.session.commit()
+        return Response(status=201, headers={
+            "Location": rating.get_rating_url()
+        })
+
+@app.route('/users/<int:user_id>', methods=['GET'])
+def user_info(user_id):
+    user = User.query.get_or_404(user_id)
+    return jsonify(
+            username=user.username,
+            ratings=[{
+                "rating": rating.rating,
+                "dish": rating.dish.get_info_url(),
+                "url": rating.get_rating_url()
+
+            } for rating in user.ratings]
+        )
+
+@app.route('/ratings', methods=['GET'])
+def ratings():
+    return jsonify(
+            ratings=[{
+                "rating": rating.rating,
+                "dish": rating.dish.get_info_url(),
+                "user": rating.user.get_info_url(),
+                "url": rating.get_rating_url()
+            } for rating in Rating.query.all()]
+        )
+
+@app.route('/ratings/<int:rating_id>', methods=['GET', 'DELETE', 'PUT'])
+def rating_info(rating_id):
+    rating = Rating.query.get_or_404(rating_id)
+    if request.method == 'GET':
+        return jsonify(
+                    rating=rating.rating,
+                    dish=rating.dish.get_info_url(),
+                    user=rating.user.get_info_url(),
+                )
+    elif request.method == 'DELETE':
+        db.session.delete(rating)
+        db.session.commit()
+        return Response(status=200)
+    elif request.method == 'PUT':
+        if not request.json:
+            return Response(status=400)
+
+        try:
+            new_rating = request.json["rating"]
+        except:
+            return Response(status=400)
+
+        rating.rating = new_rating
+        db.session.commit()
+        return Response(status=200)
+
