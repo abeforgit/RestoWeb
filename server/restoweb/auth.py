@@ -34,7 +34,7 @@ def login():
             return Response(status=401)
         login_user(user, remember=True)
 
-    return jsonify({"token": current_user.apikey, "username": username, "is_admin": user.admin})
+    return jsonify({"token": current_user.apikey, "username": current_user.username, "is_admin": current_user.admin})
 
 
 @app.route('/signup', methods=['POST'])
