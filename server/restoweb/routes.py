@@ -197,7 +197,7 @@ def restos_menus(resto_id):
 @app.route('/restos/<int:resto_id>/latestmenu')
 def restos_latestmenu(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
-    db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first()
+    db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first_or_404()
 
     dish_list = [{
         'url': dish.get_info_url(),
