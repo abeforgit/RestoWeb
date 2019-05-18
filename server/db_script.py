@@ -1,5 +1,5 @@
-from restoweb import db
-from restoweb.models import Resto, Schedule, Menu, Dish, DishType
+from restoweb import db, bcrypt
+from restoweb.models import Resto, Schedule, Menu, Dish, DishType, User
 import datetime
 
 db.drop_all()
@@ -105,5 +105,8 @@ for schedule in schedules:
 for menu in menus:
     db.session.add(menu)
 
-
+user = User(username='test', password_hash=bcrypt.generate_password_hash("test").decode('utf-8'))
+db.session.add(user)
 db.session.commit()
+print("API KEY:")
+print(user.apikey)
