@@ -3,8 +3,15 @@ from flask_login import UserMixin
 from restoweb import db
 import random
 import string
-from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url, inject_context
 
+def get_restos_url():
+    return url_for('.restos', _external=True)
+
+def get_menus_url():
+    return url_for('.menus', _external=True)
+
+def get_dishes_url():
+    return url_for('.dishes', _external=True)
 
 def generate_api_token(size=32):
     return ''.join(
@@ -59,7 +66,6 @@ class Resto(db.Model):
         menu_list = {
             'url': self.get_menus_url()
         }
-
         return {
             '@type': 'schema:Restaurant',
             'url': self.get_info_url(),

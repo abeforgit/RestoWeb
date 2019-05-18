@@ -3,7 +3,7 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url, inject_context
+from restoweb.util import get_home_url, dish_from_url, inject_context
 import math
 
 
@@ -29,8 +29,8 @@ def restos():
 
         return jsonify(inject_context({
             'restos': resto_list,
-            'home' :get_home_url()
-        }, Resto.get_context())
+            'home': get_home_url()
+        }, Resto.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -69,7 +69,7 @@ def restos():
 def restos_info(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
     if request.method == 'GET':
-        return jsonify(inject_context(db_resto.serialize(), Resto.get_context()))
+        return jsonify(inject_context(db_resto.serialize_full(), Resto.get_context()))
 
     elif request.method == 'DELETE':
         if check_admin():
