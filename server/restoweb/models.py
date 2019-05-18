@@ -199,3 +199,22 @@ class Rating(db.Model):
 
     def get_rating_url(self):
         return url_for('.rating_info', rating_id=self.id, _external=True)
+
+    def serialize(self):
+        return {
+            "@type": "scheme:Review",
+            "rating": self.rating,
+            "dish": self.dish.get_info_url(),
+            "user": self.user.get_info_url(),
+            "url": self.get_rating_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "user": "schema:author",
+            "dish": "schema:itemReviewed",
+            "rating": "schema:reviewRating:ratingValue"
+        }

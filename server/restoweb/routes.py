@@ -3,7 +3,8 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType, Rating, User
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, dish_from_url, inject_contextimport math
+from restoweb.util import get_home_url, dish_from_url, inject_context
+import math
 
 
 @app.route('/')
@@ -404,36 +405,23 @@ def ratings_info(dish_id):
 @app.route('/users/<int:user_id>', methods=['GET'])
 def user_info(user_id):
     user = User.query.get_or_404(user_id)
-    return jsonify(
-            username=user.username,
-            ratings=[{
-                "rating": rating.rating,
-                "dish": rating.dish.get_info_url(),
-                "url": rating.get_rating_url()
-
-            } for rating in user.ratings]
-        )
+    return jsonify(inject_context({
+            'username': user.username,
+            'ratings': [rating.serialize() for rating in user.ratings]
+            }, Rating.get_context()))
 
 @app.route('/ratings', methods=['GET'])
 def ratings():
-    return jsonify(
-            ratings=[{
-                "rating": rating.rating,
-                "dish": rating.dish.get_info_url(),
-                "user": rating.user.get_info_url(),
-                "url": rating.get_rating_url()
-            } for rating in Rating.query.all()]
-        )
+    return jsonify(inject_context(
+            {'ratings': [rating.serialize() for rating in Rating.query.all()]},
+            Rating.get_context()
+        ))
 
 @app.route('/ratings/<int:rating_id>', methods=['GET', 'DELETE', 'PUT'])
 def rating_info(rating_id):
     rating = Rating.query.get_or_404(rating_id)
     if request.method == 'GET':
-        return jsonify(
-                    rating=rating.rating,
-                    dish=rating.dish.get_info_url(),
-                    user=rating.user.get_info_url(),
-                )
+        return jsonify(inject_context(rating.serialize(), Rating.get_context()))
     elif request.method == 'DELETE':
         db.session.delete(rating)
         db.session.commit()
