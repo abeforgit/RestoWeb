@@ -107,7 +107,7 @@ def restos_info(resto_id):
             return Response(status=200)
         else:
             return Response(status=401)
-    
+
     elif request.method == 'PUT':
         if check_admin():
             if (not request.json):
@@ -302,7 +302,7 @@ def menus_info(menu_id):
             for dish in dishes:
                 if dish_from_url(dish["url"]) not in menu.dishes:
                     menu.dishes.append(dish_from_url(dish["url"]))
-            
+
             return Response(status=200)
         else:
             return Response(status=401)
@@ -336,7 +336,7 @@ def menus_dishes(menu_id):
             return Response(status=401)
         if (not request.json):
             return Response(status=400)
-        
+
         try:
             dishes = request.json["dishes"]
         except:
@@ -461,13 +461,13 @@ def ratings_info(dish_id):
     elif request.method == 'POST':
         if not request.json:
             return Response(status=400)
-        
+
         try:
             rating = int(request.json['rating'])
         except:
             return Response(status=400)
 
-        if rating > 5 or rating < 1:
+        if rating > 5 or rating < 1 or Rating.query.filter_by(user=current_user, dish=dish).count():
             return Response(status=400)
 
         rating = Rating(
@@ -530,4 +530,3 @@ def rating_info(rating_id):
         rating.rating = new_rating
         db.session.commit()
         return Response(status=200)
-
