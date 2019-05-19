@@ -47,3 +47,6 @@ def load_user(user_id):
     return restoweb.models.User.query.get(int(user_id))
 
 import restoweb.auth
+
+if 'PRODUCTION' in app.config:
+    import restoweb.custom_routing

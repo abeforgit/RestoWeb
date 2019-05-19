@@ -7,4 +7,5 @@ User=resto
 Group=www-data
 WorkingDirectory=/home/resto/RestoWeb/server
 Environment="PATH=/home/resto/RestoWeb/server/venv/bin"
+Environment="FLASKR_SETTINGS=/home/resto/restoweb.conf"
 ExecStart=/home/resto/RestoWeb/server/venv/bin/uwsgi --ini restoweb.ini

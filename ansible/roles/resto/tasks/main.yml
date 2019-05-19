@@ -60,5 +60,11 @@
       src: restoweb.service.j2
       dest: /etc/systemd/system/restoweb.service
 
+- name: Copy over config file
+  template:
+      src: restoweb.conf.j2
+      dest: /home/resto/restoweb.conf
+      owner: resto
+
 - name: Start restoweb
   systemd: state=restarted name=restoweb daemon_reload=yes
