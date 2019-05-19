@@ -4,14 +4,18 @@ from restoweb import db
 import random
 import string
 
+
 def get_restos_url():
     return url_for('.restos', _external=True)
+
 
 def get_menus_url():
     return url_for('.menus', _external=True)
 
+
 def get_dishes_url():
     return url_for('.dishes', _external=True)
+
 
 def generate_api_token(size=32):
     return ''.join(
@@ -25,7 +29,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
-    apikey = db.Column(db.String(32), nullable=False, default=generate_api_token)
+    apikey = db.Column(db.String(32), nullable=False,
+                       default=generate_api_token)
     ratings = db.relationship('Rating', backref='user', lazy=True)
 
     def get_info_url(self):
@@ -102,8 +107,10 @@ class Schedule(db.Model):
 
 
 menu_contains_dish = db.Table('menu_contains_dish',
-                              db.Column('menu_id', db.Integer, db.ForeignKey('menu.id'), primary_key=True),
-                              db.Column('dish_id', db.Integer, db.ForeignKey('dish.id'), primary_key=True)
+                              db.Column('menu_id', db.Integer, db.ForeignKey(
+                                  'menu.id'), primary_key=True),
+                              db.Column('dish_id', db.Integer, db.ForeignKey(
+                                  'dish.id'), primary_key=True)
                               )
 
 
@@ -143,7 +150,7 @@ class Menu(db.Model):
             "schema": "http://schema.org/",
             "url": "@id",
             "dishes": "schema:hasMenuItem",
-            }
+        }
 
 
 class Dish(db.Model):
@@ -170,6 +177,7 @@ class Dish(db.Model):
             'type': self.type.name,
             'diet': self.diet,
             'ratings': [{
+                "url": rating.get_rating_url(),
                 "rating": rating.rating,
                 "user": rating.user.get_info_url()
             } for rating in self.ratings]
@@ -182,7 +190,7 @@ class Dish(db.Model):
             "url": "@id",
             "name": "schema:name",
             "price": "schema:offers:price",
-            }
+        }
 
 
 class DishType(db.Model):
@@ -190,8 +198,9 @@ class DishType(db.Model):
 
     name = db.Column(db.String(30), nullable=False, unique=True)
 
+
 class Rating(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
