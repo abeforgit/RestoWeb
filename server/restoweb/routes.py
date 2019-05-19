@@ -139,7 +139,7 @@ def restos_menus(resto_id):
             'menus': menu_list,
 
             'meta': meta
-            }, Menu.get_context()))
+        }, Menu.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -173,7 +173,8 @@ def restos_menus(resto_id):
 @app.route('/restos/<int:resto_id>/latestmenu')
 def restos_latestmenu(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
-    db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first_or_404()
+    db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(
+        Menu.date <= datetime.today()).order_by(Menu.date.desc()).first_or_404()
 
     return jsonify(inject_context(db_menu.serialize_full(), Menu.get_context()))
 
@@ -209,7 +210,7 @@ def menus():
             'menus': menu_list,
             'home': get_home_url(),
             'meta': meta
-            }, Menu.get_context())
+        }, Menu.get_context())
         )
 
 
@@ -264,7 +265,7 @@ def menus_dishes(menu_id):
             'url': menu.get_dishes_url(),
             'menu': menu_key,
             'dishes': dish_list
-            }, Dish.get_context())
+        }, Dish.get_context())
         )
 
     elif request.method == 'POST':
@@ -367,12 +368,13 @@ def dishes_info(dish_id):
         else:
             return Response(status=401)
 
+
 @app.route('/dishes/<int:dish_id>/ratings', methods=['GET', 'POST'])
 def ratings_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
         return jsonify(
-           ratings=[{
+            ratings=[{
                 "rating": rating.rating,
                 "user": rating.user.get_info_url(),
                 "url": rating.get_rating_url()
@@ -392,8 +394,8 @@ def ratings_info(dish_id):
             return Response(status=400)
 
         rating = Rating(
-                rating=rating
-            )
+            rating=rating
+        )
         dish.ratings.append(rating)
         current_user.ratings.append(rating)
         db.session.add(rating)
@@ -402,20 +404,23 @@ def ratings_info(dish_id):
             "Location": rating.get_rating_url()
         })
 
+
 @app.route('/users/<int:user_id>', methods=['GET'])
 def user_info(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(inject_context({
-            'username': user.username,
-            'ratings': [rating.serialize() for rating in user.ratings]
-            }, Rating.get_context()))
+        'username': user.username,
+        'ratings': [rating.serialize() for rating in user.ratings]
+    }, Rating.get_context()))
+
 
 @app.route('/ratings', methods=['GET'])
 def ratings():
     return jsonify(inject_context(
-            {'ratings': [rating.serialize() for rating in Rating.query.all()]},
-            Rating.get_context()
-        ))
+        {'ratings': [rating.serialize() for rating in Rating.query.all()]},
+        Rating.get_context()
+    ))
+
 
 @app.route('/ratings/<int:rating_id>', methods=['GET', 'DELETE', 'PUT'])
 def rating_info(rating_id):
@@ -438,3 +443,9 @@ def rating_info(rating_id):
         rating.rating = new_rating
         db.session.commit()
         return Response(status=200)
+
+
+@app.after_request
+def insert_headers(response):
+    response.headers['Vary'] = 'Accept'
+    return response
