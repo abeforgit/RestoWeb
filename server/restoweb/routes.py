@@ -440,7 +440,17 @@ def rating_info(rating_id):
         return Response(status=200)
 
 @app.route('/turtle', methods=["GET"])
-def sparql():
+def turtle():
     if request.method == "GET":
         graph = build_rdfgraph()
         return graph.serialize(format="turtle")
+
+@app.route('/sparql', methods=["POST"])
+def sparql():
+    if request.method == "POST":
+        graph = build_rdfgraph()
+        try:
+            return graph.query(request.get_data()).serialize(format="json")
+        except:
+            return Response(status=400)
+        return "Yeet"
