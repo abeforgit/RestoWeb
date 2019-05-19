@@ -1,5 +1,5 @@
 from restoweb import db
-from restoweb.models import Resto, Dish, get_dishes_url
+from restoweb.models import Resto, Dish, get_dishes_url, get_restos_url
 from flask import url_for
 
 

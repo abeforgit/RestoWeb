@@ -3,7 +3,7 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType, Rating, User
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, dish_from_url, inject_context
+from restoweb.util import get_home_url, dish_from_url, inject_context, resto_from_url
 import math
 
 
@@ -405,13 +405,29 @@ def ratings_info(dish_id):
         })
 
 
-@app.route('/users/<int:user_id>', methods=['GET'])
+@app.route('/users/<int:user_id>', methods=['GET', 'PUT'])
 def user_info(user_id):
     user = User.query.get_or_404(user_id)
-    return jsonify(inject_context({
-        'username': user.username,
-        'ratings': [rating.serialize() for rating in user.ratings]
-    }, Rating.get_context()))
+    if request.method == 'GET':
+        return jsonify(inject_context({
+            'username': user.username,
+            'ratings': [rating.serialize() for rating in user.ratings],
+            'favourite_resto': user.favourite_resto
+        }, Rating.get_context()))
+    elif request.method == 'PUT':
+        if user != current_user and not check_admin():
+            return Response(status=401)
+        try:
+            resto_url = request.json['favourite_resto']
+            resto = resto_from_url(resto_url)
+            user.favourite_resto = resto
+            db.session.add(user)
+            db.session.commit()
+            return Response(status=200)
+        except:
+            return Response(status=400)
+
+
 
 
 @app.route('/ratings', methods=['GET'])
