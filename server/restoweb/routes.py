@@ -3,8 +3,7 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType, Rating, User
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, get_menus_url, get_restos_url, resto_from_url, dish_from_url
-from restoweb.auth import load_user_from_request
+from restoweb.util import get_home_url, dish_from_url, inject_context
 import math
 
 
@@ -23,14 +22,15 @@ def restos():
         db_restos = Resto.query.all()
 
         resto_list = [{
+            '@type': 'schema:Restaurant',
             'name': resto.name,
             'url': resto.get_info_url()
         } for resto in db_restos]
 
-        return jsonify(
-            restos=resto_list,
-            home=get_home_url()
-        )
+        return jsonify(inject_context({
+            'restos': resto_list,
+            'home': get_home_url()
+        }, Resto.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -68,38 +68,12 @@ def restos():
 @app.route('/restos/<int:resto_id>', methods=['GET', 'DELETE', 'PUT'])
 def restos_info(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
-    db_schedules = Schedule.query.filter_by(resto_id=resto_id).all()
     if request.method == 'GET':
-        schedule_result = [{
-            'time_open': schedule.time_open.isoformat(),
-            'time_closed': schedule.time_closed.isoformat()
-        } for schedule in db_schedules]
-
-        location = {
-            'zip_code': db_resto.zip_code,
-            'city': db_resto.city,
-            'address': db_resto.address,
-            'campus': db_resto.campus
-        }
-
-        menu_list = {
-            'url': db_resto.get_menus_url()
-        }
-
-        return jsonify(
-            url=db_resto.get_info_url(),
-
-            name=db_resto.name,
-            description=db_resto.description,
-            location=location,
-            menus=menu_list,
-            schedules=schedule_result,
-
-            index=get_restos_url()
-        )
+        return jsonify(inject_context(db_resto.serialize_full(), Resto.get_context()))
 
     elif request.method == 'DELETE':
         if check_admin():
+            db_schedules = Schedule.query.filter_by(resto_id=resto_id).all()
             db.session.delete(db_resto)
             for s in db_schedules:
                 db.session.delete(s)
@@ -139,7 +113,8 @@ def restos_menus(resto_id):
             Menu.date.desc()).paginate(page, per_page, error_out=False).items
 
         menu_list = [{
-            'url': menu.get_info_url()
+            'url': menu.get_info_url(),
+            '@type': 'schema:Menu'
         } for menu in db_menus_paginate]
 
         resto_key = {
@@ -157,14 +132,14 @@ def restos_menus(resto_id):
             }
         }
 
-        return jsonify(
-            url=db_resto.get_menus_url(),
+        return jsonify(inject_context({
+            'url': db_resto.get_menus_url(),
 
-            resto=resto_key,
-            menus=menu_list,
+            'resto': resto_key,
+            'menus': menu_list,
 
-            meta=meta
-        )
+            'meta': meta
+            }, Menu.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -200,23 +175,7 @@ def restos_latestmenu(resto_id):
     db_resto = Resto.query.get_or_404(resto_id)
     db_menu = Menu.query.filter_by(resto_id=db_resto.id).filter(Menu.date <= datetime.today()).order_by(Menu.date.desc()).first_or_404()
 
-    dish_list = [{
-        'url': dish.get_info_url(),
-    } for dish in db_menu.dishes]
-
-    resto_key = {
-        'url': db_resto.get_info_url()
-    }
-
-    return jsonify(
-        url=db_menu.get_info_url(),
-
-        date=db_menu.date,
-        dishes=dish_list,
-        resto=resto_key,
-
-        index=get_menus_url()
-    )
+    return jsonify(inject_context(db_menu.serialize_full(), Menu.get_context()))
 
 
 @app.route('/menus', methods=['GET'])
@@ -231,7 +190,8 @@ def menus():
 
         menu_list = [{
             'url': menu.get_info_url(),
-            'date': menu.date
+            'date': menu.date,
+            '@type': 'schema:Menu'
         } for menu in db_menus_paginate]
 
         menu_amount = db_menu_query.count()
@@ -245,11 +205,11 @@ def menus():
             }
         }
 
-        return jsonify(
-            menus=menu_list,
-            home=get_home_url(),
-
-            meta=meta
+        return jsonify(inject_context({
+            'menus': menu_list,
+            'home': get_home_url(),
+            'meta': meta
+            }, Menu.get_context())
         )
 
 
@@ -257,25 +217,7 @@ def menus():
 def menus_info(menu_id):
     menu = Menu.query.get_or_404(menu_id)
     if request.method == "GET":
-        resto = Resto.query.get_or_404(menu.resto_id)
-
-        dish_list = [{
-            'url': dish.get_info_url(),
-        } for dish in menu.dishes]
-
-        resto_key = {
-            'url': resto.get_info_url()
-        }
-
-        return jsonify(
-            url=menu.get_info_url(),
-
-            date=menu.date,
-            dishes=dish_list,
-            resto=resto_key,
-
-            index=get_menus_url()
-        )
+        return jsonify(inject_context(menu.serialize_full(), Menu.get_context()))
     elif request.method == "DELETE":
         if not check_admin():
             return Response(status=401)
@@ -312,23 +254,17 @@ def menus_info(menu_id):
 def menus_dishes(menu_id):
     menu = Menu.query.get_or_404(menu_id)
     if request.method == 'GET':
-        dish_list = [{
-            'url': dish.get_info_url(),
-            'name': dish.name,
-            'price': dish.price,
-            'type': dish.type.name,
-            'diet': dish.diet
-        } for dish in menu.dishes]
+        dish_list = [dish.serialize() for dish in menu.dishes]
 
         menu_key = {
             'url': menu.get_info_url()
         }
 
-        return jsonify(
-            url=menu.get_dishes_url(),
-
-            menu=menu_key,
-            dishes=dish_list
+        return jsonify(inject_context({
+            'url': menu.get_dishes_url(),
+            'menu': menu_key,
+            'dishes': dish_list
+            }, Dish.get_context())
         )
 
     elif request.method == 'POST':
@@ -353,18 +289,12 @@ def dishes():
     if request.method == 'GET':
         db_dishes = Dish.query.all()
 
-        dish_list = [{
-            'url': dish.get_info_url(),
-            'name': dish.name,
-            'price': dish.price,
-            'type': dish.type.name,
-            'diet': dish.diet
-        } for dish in db_dishes]
+        dish_list = [dish.serialize() for dish in db_dishes]
 
-        return jsonify(
-            dishes=dish_list,
-            home=get_home_url()
-        )
+        return jsonify(inject_context({
+            'dishes': dish_list,
+            'home': get_home_url()
+        }, Dish.get_context()))
 
     elif request.method == 'POST':
         if not check_admin():
@@ -399,16 +329,7 @@ def dishes_info(dish_id):
     dish = Dish.query.get_or_404(dish_id)
     if request.method == 'GET':
         return jsonify(
-            url=dish.get_info_url(),
-
-            name=dish.name,
-            type=dish.type.name,
-            price=dish.price,
-            diet=dish.diet,
-            ratings=[{
-                "rating": rating.rating,
-                "user": rating.user.get_info_url()
-            } for rating in dish.ratings]
+            inject_context(dish.serialize(), Dish.get_context())
         )
 
     elif request.method == 'DELETE':
@@ -484,36 +405,23 @@ def ratings_info(dish_id):
 @app.route('/users/<int:user_id>', methods=['GET'])
 def user_info(user_id):
     user = User.query.get_or_404(user_id)
-    return jsonify(
-            username=user.username,
-            ratings=[{
-                "rating": rating.rating,
-                "dish": rating.dish.get_info_url(),
-                "url": rating.get_rating_url()
-
-            } for rating in user.ratings]
-        )
+    return jsonify(inject_context({
+            'username': user.username,
+            'ratings': [rating.serialize() for rating in user.ratings]
+            }, Rating.get_context()))
 
 @app.route('/ratings', methods=['GET'])
 def ratings():
-    return jsonify(
-            ratings=[{
-                "rating": rating.rating,
-                "dish": rating.dish.get_info_url(),
-                "user": rating.user.get_info_url(),
-                "url": rating.get_rating_url()
-            } for rating in Rating.query.all()]
-        )
+    return jsonify(inject_context(
+            {'ratings': [rating.serialize() for rating in Rating.query.all()]},
+            Rating.get_context()
+        ))
 
 @app.route('/ratings/<int:rating_id>', methods=['GET', 'DELETE', 'PUT'])
 def rating_info(rating_id):
     rating = Rating.query.get_or_404(rating_id)
     if request.method == 'GET':
-        return jsonify(
-                    rating=rating.rating,
-                    dish=rating.dish.get_info_url(),
-                    user=rating.user.get_info_url(),
-                )
+        return jsonify(inject_context(rating.serialize(), Rating.get_context()))
     elif request.method == 'DELETE':
         db.session.delete(rating)
         db.session.commit()

@@ -5,15 +5,6 @@ from flask import url_for
 def get_home_url():
     return url_for('.index', _external=True)
 
-def get_restos_url():
-    return url_for('.restos', _external=True)
-
-def get_menus_url():
-    return url_for('.menus', _external=True)
-
-def get_dishes_url():
-    return url_for('.dishes', _external=True)
-
 def resto_from_url(url):
     if (not url.startswith(get_restos_url())):
         print(f"{url} does not start with {get_restos_url()}");
@@ -37,3 +28,7 @@ def dish_from_url(url):
             return dish
         except:
             return None
+
+def inject_context(d, context):
+    d['@context'] = context
+    return d

@@ -4,6 +4,14 @@ from restoweb import db
 import random
 import string
 
+def get_restos_url():
+    return url_for('.restos', _external=True)
+
+def get_menus_url():
+    return url_for('.menus', _external=True)
+
+def get_dishes_url():
+    return url_for('.dishes', _external=True)
 
 def generate_api_token(size=32):
     return ''.join(
@@ -19,7 +27,7 @@ class User(db.Model, UserMixin):
     admin = db.Column(db.Boolean, nullable=False, default=False)
     apikey = db.Column(db.String(32), nullable=False, default=generate_api_token)
     ratings = db.relationship('Rating', backref='user', lazy=True)
-    
+
     def get_info_url(self):
         return url_for('.user_info', user_id=self.id, _external=True)
 
@@ -44,6 +52,44 @@ class Resto(db.Model):
 
     def get_menus_url(self):
         return url_for('.restos_menus', resto_id=self.id, _external=True)
+
+    def serialize_full(self):
+        db_schedules = Schedule.query.filter_by(resto_id=self.id).all()
+        schedule_result = [{
+            'time_open': schedule.time_open.isoformat(),
+            'time_closed': schedule.time_closed.isoformat()
+        } for schedule in db_schedules]
+
+        location = {
+            'zip_code': self.zip_code,
+            'city': self.city,
+            'address': self.address,
+            'campus': self.campus
+        }
+
+        menu_list = {
+            'url': self.get_menus_url()
+        }
+        return {
+            '@type': 'schema:Restaurant',
+            'url': self.get_info_url(),
+            'name': self.name,
+            'description': self.description,
+            'location': location,
+            'menus': menu_list,
+            'schedules': schedule_result,
+            'index': get_restos_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "name": "schema:name",
+            "description": "scheme:description",
+            "menus": "scheme:hasMenu"
+        }
 
 
 class Schedule(db.Model):
@@ -77,6 +123,28 @@ class Menu(db.Model):
     def get_dishes_url(self):
         return url_for('.menus_dishes', menu_id=self.id, _external=True)
 
+    def serialize_full(self):
+        dish_list = [{'url': dish.get_info_url()} for dish in self.dishes]
+        return {
+            '@type': 'schema:Menu',
+            'url': self.get_info_url(),
+
+            'date': self.date,
+            'dishes': dish_list,
+            'resto': {
+                'url': Resto.query.get_or_404(self.resto_id).get_info_url(),
+            },
+            'index': get_menus_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "dishes": "schema:hasMenuItem",
+            }
+
 
 class Dish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -91,6 +159,30 @@ class Dish(db.Model):
 
     def get_info_url(self):
         return url_for('.dishes_info', dish_id=self.id, _external=True)
+
+    def serialize(self):
+        return {
+            '@type': 'schema:MenuItem',
+            'url': self.get_info_url(),
+            'name': self.name,
+            'price': self.price,
+            # TODO suitableForDiet
+            'type': self.type.name,
+            'diet': self.diet,
+            'ratings': [{
+                "rating": rating.rating,
+                "user": rating.user.get_info_url()
+            } for rating in self.ratings]
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "name": "schema:name",
+            "price": "schema:offers:price",
+            }
 
 
 class DishType(db.Model):
@@ -107,3 +199,22 @@ class Rating(db.Model):
 
     def get_rating_url(self):
         return url_for('.rating_info', rating_id=self.id, _external=True)
+
+    def serialize(self):
+        return {
+            "@type": "scheme:Review",
+            "rating": self.rating,
+            "dish": self.dish.get_info_url(),
+            "user": self.user.get_info_url(),
+            "url": self.get_rating_url()
+        }
+
+    @staticmethod
+    def get_context():
+        return {
+            "schema": "http://schema.org/",
+            "url": "@id",
+            "user": "schema:author",
+            "dish": "schema:itemReviewed",
+            "rating": "schema:reviewRating:ratingValue"
+        }
