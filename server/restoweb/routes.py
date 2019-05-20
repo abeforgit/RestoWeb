@@ -415,22 +415,26 @@ def user_info(user_id):
         return jsonify(inject_context({
             'username': user.username,
             'ratings': [rating.serialize() for rating in user.ratings],
-            'favourite_resto': user.favourite_resto
+            'favourite_resto': user.favourite_resto.get_info_url()
         }, Rating.get_context()))
     elif request.method == 'PUT':
-        if user != current_user and not check_admin():
+        if user_id != current_user.id:
             return Response(status=401)
         try:
+            req = request
             resto_url = request.json['favourite_resto']
             resto = resto_from_url(resto_url)
             user.favourite_resto = resto
             db.session.add(user)
             db.session.commit()
+            # return jsonify(inject_context({
+            #     'username': user.username,
+            #     'ratings': [rating.serialize() for rating in user.ratings],
+            #     'favourite_resto': user.favourite_resto
+            # }, Rating.get_context()))
             return Response(status=200)
         except:
             return Response(status=400)
-
-
 
 
 @app.route('/ratings', methods=['GET'])
@@ -463,11 +467,13 @@ def rating_info(rating_id):
         db.session.commit()
         return Response(status=200)
 
+
 @app.route('/turtle', methods=["GET"])
 def turtle():
     if request.method == "GET":
         graph = build_rdfgraph()
         return graph.serialize(format="turtle")
+
 
 @app.route('/sparql', methods=["POST"])
 def sparql():
@@ -478,6 +484,7 @@ def sparql():
         except:
             return Response(status=400)
         return "Yeet"
+
 
 @app.after_request
 def insert_headers(response):
