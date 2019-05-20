@@ -3,7 +3,7 @@ from restoweb.models import Resto, Schedule, Menu, Dish, DishType, Rating, User
 from flask_login import current_user
 from flask import render_template, request, jsonify, Response
 from datetime import datetime
-from restoweb.util import get_home_url, dish_from_url, inject_context, resto_from_url
+from restoweb.util import get_home_url, dish_from_url, inject_context, resto_from_url, build_rdfgraph
 import math
 
 
@@ -242,9 +242,12 @@ def menus_info(menu_id):
 
             menu.date = menu_date_datetime
 
+            updated_dishes = []
             for dish in dishes:
-                if dish_from_url(dish["url"]) not in menu.dishes:
-                    menu.dishes.append(dish_from_url(dish["url"]))
+                updated_dishes.append(dish_from_url(dish["url"]))
+
+            menu.dishes = updated_dishes
+            db.session.commit()
 
             return Response(status=200)
         else:
@@ -460,6 +463,21 @@ def rating_info(rating_id):
         db.session.commit()
         return Response(status=200)
 
+@app.route('/turtle', methods=["GET"])
+def turtle():
+    if request.method == "GET":
+        graph = build_rdfgraph()
+        return graph.serialize(format="turtle")
+
+@app.route('/sparql', methods=["POST"])
+def sparql():
+    if request.method == "POST":
+        graph = build_rdfgraph()
+        try:
+            return graph.query(request.get_data()).serialize(format="json")
+        except:
+            return Response(status=400)
+        return "Yeet"
 
 @app.after_request
 def insert_headers(response):
