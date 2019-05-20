@@ -17,6 +17,7 @@ setup(
         'jinja2',
         'uwsgi',
         'flask_login',
-        'pytest'
+        'pytest',
+        'rdflib'
     ],
 )
