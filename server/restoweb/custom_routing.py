@@ -17,7 +17,8 @@ for r, d, f in os.walk(static_path):
 def before_request():
     json_accept = 'application/json'
     html_accept = 'text/html'
-    accepted = [html_accept, json_accept]
+    turtle_accept = 'text/turtle'
+    accepted = [html_accept, json_accept, turtle_accept]
     best_match = request.accept_mimetypes.best_match(accepted, default=html_accept)
     if best_match == json_accept:
         # Go to default routing
