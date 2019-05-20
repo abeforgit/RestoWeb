@@ -48,6 +48,7 @@ def build_rdfgraph():
 
         ret.add( (person, RDF.type, schemaorg.Person) )
         ret.add( (person, schemaorg.name, Literal(user.username)) )
+        ret.add( (person, schemaorg.url, Literal(user.get_info_url())) )
         person_mapping[user.username] = person
 
     for resto in Resto.query.all():
@@ -55,6 +56,7 @@ def build_rdfgraph():
         ret.add( (resto_node, RDF.type, schemaorg.Restaurant) )
         ret.add( (resto_node, schemaorg.name, Literal(resto.name)) )
         ret.add( (resto_node, schemaorg.description, Literal(resto.description)) )
+        ret.add( (resto_node, schemaorg.url, Literal(resto.get_info_url())) )
         opening_hours = ""
         for schedule in resto.schedule:
             opening_hours += schedule.time_open.strftime("%H:%M")
@@ -71,11 +73,13 @@ def build_rdfgraph():
             menu_node = BNode()
             ret.add( (menu_node, RDF.type, schemaorg.Menu) ) 
             ret.add( (menu_node, schemaorg.expires, Literal(menu.date.isoformat())) )
+            ret.add( (menu_node, schemaorg.url, Literal(menu.get_info_url())) )
 
             for dish in menu.dishes:
                 menu_item = BNode()
                 ret.add( (menu_item, RDF.type, schemaorg.MenuItem) )
                 ret.add( (menu_item, schemaorg.name, Literal(dish.name)) )
+                ret.add( (menu_item, schemaorg.url, Literal(dish.get_info_url())) )
                 if dish.diet == "vegan":
                     ret.add( (menu_item, schemaorg.suitableForDiet, schemaorg.VegetarianDiet) )
                     ret.add( (menu_item, schemaorg.suitableForDiet, schemaorg.VeganDiet) )
@@ -96,6 +100,7 @@ def build_rdfgraph():
                     ret.add( (rating, RDF.type, schemaorg.Rating) )
                     ret.add( (rating, schemaorg.author, person_mapping[db_rating.user.username]) )
                     ret.add( (rating, schemaorg.ratingValue, Literal(db_rating.rating)) )
+                    ret.add( (rating, schemaorg.url, Literal(db_rating.get_rating_url())) )
 
                     ret.add( (review, schemaorg.reviewRating, rating) )
 
@@ -104,6 +109,5 @@ def build_rdfgraph():
 
                 ret.add( (menu_node, schemaorg.hasMenuItem, menu_item) )
                 ret.add( (menu_node, schemaorg.hasMenuSection, Literal(dish.type.name)) )
-
-
+            ret.add( (resto_node, schemaorg.hasMenu, menu_node) )
     return ret
