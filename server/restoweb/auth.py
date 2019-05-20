@@ -34,7 +34,13 @@ def login():
             return Response(status=401)
         login_user(user, remember=True)
 
-    return jsonify({"token": current_user.apikey, "username": current_user.username, "is_admin": current_user.admin, "url": current_user.get_info_url()})
+    favourite_resto = current_user.favourite_resto.get_info_url() if current_user.favourite_resto else None
+    return jsonify({
+        "token": current_user.apikey,
+        "username": current_user.username,
+        "is_admin": current_user.admin,
+        "url": current_user.get_info_url(),
+        "favourite_resto": favourite_resto})
 
 
 @app.route('/signup', methods=['POST'])
