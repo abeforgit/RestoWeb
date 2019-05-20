@@ -32,6 +32,7 @@ class User(db.Model, UserMixin):
     apikey = db.Column(db.String(32), nullable=False,
                        default=generate_api_token)
     ratings = db.relationship('Rating', backref='user', lazy=True)
+    favourite_resto_id = db.Column(db.Integer, db.ForeignKey('resto.id'))
 
     def get_info_url(self):
         return url_for('.user_info', user_id=self.id, _external=True)
@@ -51,6 +52,7 @@ class Resto(db.Model):
 
     schedule = db.relationship('Schedule', backref='resto', lazy=True)
     menu = db.relationship('Menu', backref='resto', lazy=True)
+    users_having_favourite = db.relationship('User', backref='favourite_resto', lazy=True)
 
     def get_info_url(self):
         return url_for('.restos_info', resto_id=self.id, _external=True)
