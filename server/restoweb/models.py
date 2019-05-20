@@ -99,7 +99,7 @@ class DishType(db.Model):
     name = db.Column(db.String(30), nullable=False, unique=True)
 
 class Rating(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     dish_id = db.Column(db.Integer, db.ForeignKey('dish.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

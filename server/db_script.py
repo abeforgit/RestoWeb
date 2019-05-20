@@ -105,7 +105,7 @@ for schedule in schedules:
 for menu in menus:
     db.session.add(menu)
 
-user = User(username='test', password_hash=bcrypt.generate_password_hash("test").decode('utf-8'))
+user = User(username="test", password_hash=bcrypt.generate_password_hash("test").decode('utf-8'), admin=True)
 db.session.add(user)
 db.session.commit()
 print("API KEY:")

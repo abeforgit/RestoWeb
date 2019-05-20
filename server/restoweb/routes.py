@@ -299,9 +299,12 @@ def menus_info(menu_id):
 
             menu.date = menu_date_datetime
 
+            updated_dishes = []
             for dish in dishes:
-                if dish_from_url(dish["url"]) not in menu.dishes:
-                    menu.dishes.append(dish_from_url(dish["url"]))
+                updated_dishes.append(dish_from_url(dish["url"]))
+
+            menu.dishes = updated_dishes
+            db.session.commit()
 
             return Response(status=200)
         else:
